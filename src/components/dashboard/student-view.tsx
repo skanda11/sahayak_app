@@ -1,3 +1,4 @@
+
 'use client';
 
 import { getStudentById, getSubjectById } from '@/lib/mock-data';

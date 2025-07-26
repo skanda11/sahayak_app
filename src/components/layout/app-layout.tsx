@@ -125,7 +125,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {pathname === '/dashboard' ? 'Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ') }
+                  {pathname.split('/').pop()?.replace(/-/g, ' ') }
                 </h1>
             </div>
         </header>
