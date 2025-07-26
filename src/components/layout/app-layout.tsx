@@ -38,10 +38,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole] = useState('teacher');
 
   useEffect(() => {
-    const role = searchParams.get('role') || 'teacher';
+    const isStudentView = pathname.includes('/student-view');
     const studentId = searchParams.get('studentId');
 
-    if (role === 'student' && studentId) {
+    if (isStudentView && studentId) {
       setUserRole('student');
       getStudentById(studentId).then((student) => {
         if (student) setUserName(student.name);
@@ -50,10 +50,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
       setUserRole('teacher');
       setUserName('Teacher');
     }
-  }, [searchParams]);
+  }, [pathname, searchParams]);
 
   const navItems = [
-    { href: `/`, icon: Home, label: 'Dashboard' },
+    { href: `/dashboard`, icon: Home, label: 'Teacher Dashboard' },
     { href: `/student-view?studentId=student-1`, icon: User, label: 'Student 1 View' },
     { href: `/student-view?studentId=student-2`, icon: User, label: 'Student 2 View' },
   ];
@@ -67,10 +67,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2">
+         <Link href="/" className="flex items-center gap-2">
             <Logo className="size-8 text-primary" />
-            <span className="text-lg font-semibold">Sahayak</span>
-          </div>
+            <span className="text-lg font-semibold">AcademiaTrack</span>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
@@ -78,12 +78,12 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={item.href === '/' ? pathname === item.href : pathname.includes('/student-view') && searchParams.get('studentId') === item.href.split('=')[1]}
+                  isActive={pathname === item.href || (pathname.includes('/student-view') && item.href.includes(searchParams.get('studentId') ?? ''))}
                   tooltip={{
                     children: item.label,
                   }}
                 >
-                  <Link href={item.label.startsWith('Student') ? `/student-view?studentId=${item.href.split('studentId=')[1]}` : `/`}>
+                  <Link href={item.href}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>

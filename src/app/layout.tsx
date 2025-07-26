@@ -1,10 +1,11 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
-import { AppLayout } from '@/components/layout/app-layout';
+import RootLayoutClient from './layout-client';
+
 
 export const metadata: Metadata = {
-  title: 'Sahayak',
+  title: 'AcademiaTrack',
   description: 'Track your academic progress with AI-powered insights.',
 };
 
@@ -21,9 +22,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet"></link>
       </head>
       <body className="font-body antialiased">
-        <AppLayout>
+        <RootLayoutClient>
           {children}
-        </AppLayout>
+        </RootLayoutClient>
         <Toaster />
       </body>
     </html>
