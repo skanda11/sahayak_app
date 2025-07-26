@@ -1,72 +1,103 @@
-import Link from 'next/link';
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BookOpen, User } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
+import { useToast } from '@/hooks/use-toast';
+import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    if (!email) {
+      toast({
+        title: 'Error',
+        description: 'Please enter your email.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Simulate role-based redirection
+    let role = 'student';
+    if (email.toLowerCase() === 'teacher@example.com') {
+      role = 'teacher';
+    } else if (email.toLowerCase().includes('student')) {
+      role = 'student';
+    }
+
+    // Simulate API call
+    setTimeout(() => {
+      toast({
+        title: 'Login Successful',
+        description: `Welcome! Redirecting to the ${role} dashboard.`,
+        className: 'bg-accent text-accent-foreground',
+      });
+      router.push(`/dashboard?role=${role}`);
+    }, 1000);
+  };
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-4xl">
-        <header className="mb-12 text-center">
+      <div className="w-full max-w-sm">
+        <header className="mb-8 text-center">
           <div className="mb-4 inline-block">
             <Logo className="h-16 w-16 text-primary" />
           </div>
-          <h1 className="font-headline text-5xl font-bold text-primary">
+          <h1 className="font-headline text-4xl font-bold text-primary">
             Welcome to AcademiaTrack
           </h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Your personal AI-powered academic companion.
+          <p className="mt-2 text-muted-foreground">
+            Sign in to access your dashboard.
           </p>
         </header>
 
-        <main>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <Card className="transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl font-headline">Student Portal</CardTitle>
-                  <CardDescription>View your progress and get help.</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-6 text-muted-foreground">
-                  Access your dashboard to see your grades, track your performance over time, and use our AI tools to clarify concepts and prepare for quizzes.
-                </p>
-                <Button asChild className="w-full" size="lg">
-                  <Link href="/dashboard?role=student">
-                    Enter as Student <ArrowRight className="ml-2" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl font-headline">Teacher Portal</CardTitle>
-                  <CardDescription>Manage grades and insights.</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-6 text-muted-foreground">
-                  Input grades and feedback for your students. Leverage AI-generated performance insights to support their learning journey effectively.
-                </p>
-                <Button asChild className="w-full" size="lg">
-                  <Link href="/dashboard?role=teacher">
-                    Enter as Teacher <ArrowRight className="ml-2" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
+              Use <span className="font-semibold">teacher@example.com</span> or <span className="font-semibold">student@example.com</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  'Logging in...'
+                ) : (
+                  <>
+                    <LogIn className="mr-2" />
+                    Login
+                  </>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
