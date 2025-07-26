@@ -5,8 +5,8 @@ import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
 import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
 
-export default function StudentView({ studentId }: { studentId: string }) {
-  const student = getStudentById(studentId);
+export default async function StudentView({ studentId }: { studentId: string }) {
+  const student = await getStudentById(studentId);
 
   if (!student) {
     return <div>Student not found.</div>;

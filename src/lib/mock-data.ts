@@ -1,5 +1,7 @@
 import { Book, Calculator, Dna, FlaskConical, Globe } from 'lucide-react';
-import type { Student, Subject } from './types';
+import type { Student, Subject, Grade } from './types';
+import { db } from './firebase';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 
 export const subjects: Subject[] = [
   { id: 'math', name: 'Mathematics', icon: Calculator },
@@ -45,14 +47,31 @@ export const students: Student[] = [
   },
 ];
 
-const teacherEmails = ['1teacher@example.com'];
+const teacherEmails = ['teacher@example.com'];
 
 export function isTeacherEmail(email: string): boolean {
   return teacherEmails.includes(email.toLowerCase());
 }
 
-export function getStudentById(id: string): Student | undefined {
-  return students.find((s) => s.id === id);
+export async function getStudentById(id: string): Promise<Student | undefined> {
+  const studentDocRef = doc(db, 'students', id);
+  const studentDoc = await getDoc(studentDocRef);
+
+  if (!studentDoc.exists()) {
+    // Fallback to mock data if student not in Firestore
+    return students.find((s) => s.id === id);
+  }
+
+  const studentData = studentDoc.data();
+  const gradesCollectionRef = collection(db, 'students', id, 'grades');
+  const gradesSnapshot = await getDocs(gradesCollectionRef);
+  const grades = gradesSnapshot.docs.map(doc => doc.data() as Grade);
+
+  return {
+    id: studentDoc.id,
+    name: studentData.name,
+    grades: grades,
+  };
 }
 
 export function getSubjectById(id: string): Subject | undefined {
@@ -68,7 +87,7 @@ export function getAllSubjects(): Subject[] {
 }
 
 export function addGrade(studentId: string, subjectId: string, grade: number, feedback: string) {
-    const student = getStudentById(studentId);
+    const student = students.find((s) => s.id === studentId);
     if (student) {
         student.grades.push({
             subjectId,
