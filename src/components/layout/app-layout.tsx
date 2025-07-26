@@ -39,30 +39,30 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
   const [students, setStudents] = useState<Student[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const role = searchParams.get('role');
-    const studentId = searchParams.get('studentId');
-
-    if (role === 'student' && studentId) {
-      setUserRole('student');
-      getStudentById(studentId).then((student) => {
+    async function setup() {
+      const role = searchParams.get('role');
+      const studentId = searchParams.get('studentId');
+      
+      if (role === 'student' && studentId) {
+        setUserRole('student');
+        const student = await getStudentById(studentId);
         if (student) setUserName(student.name);
         else setUserName('Student');
-      });
-    } else {
-      setUserRole('teacher');
-      setUserName('Teacher');
-    }
-  }, [searchParams]);
+      } else {
+        setUserRole('teacher');
+        setUserName('Teacher');
+      }
 
-  useEffect(() => {
-    async function fetchStudents() {
       const allStudents = await getAllStudents();
       setStudents(allStudents);
+      setIsLoading(false);
     }
-    fetchStudents();
-  }, []);
+    setup();
+  }, [searchParams]);
+
 
   const userDetails = {
     name: userName,
@@ -100,22 +100,33 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                   <span className="px-2 text-xs font-medium text-muted-foreground">Students</span>
                 </SidebarMenuItem>
               )}
-             {students.map((student) => (
-              <SidebarMenuItem key={student.id}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={searchParams.get('studentId') === student.id}
-                  tooltip={{
-                    children: student.name,
-                  }}
-                >
-                  <Link href={`/dashboard?role=student&studentId=${student.id}`}>
-                    <User />
-                    <span>{student.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
+             {isLoading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                    <SidebarMenuItem key={index}>
+                        <div className="flex items-center gap-2 p-2">
+                           <div className="h-6 w-6 rounded-full bg-muted animate-pulse"></div>
+                           <div className="h-4 w-24 rounded-md bg-muted animate-pulse"></div>
+                        </div>
+                    </SidebarMenuItem>
+                ))
+            ) : (
+                students.map((student) => (
+                    <SidebarMenuItem key={student.id}>
+                        <SidebarMenuButton
+                        asChild
+                        isActive={searchParams.get('studentId') === student.id}
+                        tooltip={{
+                            children: student.name,
+                        }}
+                        >
+                        <Link href={`/dashboard?role=student&studentId=${student.id}`}>
+                            <User />
+                            <span>{student.name}</span>
+                        </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))
+            )}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>

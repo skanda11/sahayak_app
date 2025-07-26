@@ -3,8 +3,8 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ClassTab from './class-tab';
-import SessionsTab from './sessions-tab';
-import ReviewTab from './review-tab';
+import PerformanceTab from './performance-tab';
+import ActivityTab from './activity-tab';
 
 export default function TeacherView() {
     return (
@@ -13,17 +13,17 @@ export default function TeacherView() {
             <Tabs defaultValue="class">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="class">Class</TabsTrigger>
-                    <TabsTrigger value="sessions">Sessions</TabsTrigger>
-                    <TabsTrigger value="review">Review</TabsTrigger>
+                    <TabsTrigger value="performance">Performance</TabsTrigger>
+                    <TabsTrigger value="activity">Activity</TabsTrigger>
                 </TabsList>
                 <TabsContent value="class">
                    <ClassTab />
                 </TabsContent>
-                <TabsContent value="sessions">
-                    <SessionsTab />
+                <TabsContent value="performance">
+                    <PerformanceTab />
                 </TabsContent>
-                <TabsContent value="review">
-                    <ReviewTab />
+                <TabsContent value="activity">
+                    <ActivityTab />
                 </TabsContent>
             </Tabs>
         </div>
