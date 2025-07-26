@@ -7,7 +7,7 @@
 // You can learn more about App Check here: https://firebase.google.com/docs/app-check
 
 export const firebaseConfig = {
-  apiKey: 'your-api-key',
+  apiKey: 'AIzaSyB7hNRT2GVb7yxluhNuT3xkcvmN4KPy06k',
   authDomain: 'your-auth-domain',
   projectId: 'your-project-id',
   storageBucket: 'your-storage-bucket',
