@@ -1,7 +1,6 @@
 
 
 import StudentView from '@/components/dashboard/student-view';
-import TeacherView from '@/components/dashboard/teacher-view';
 import { getStudentById } from '@/lib/mock-data';
 import type { Assignment } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';

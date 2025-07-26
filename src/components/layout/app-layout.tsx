@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, User, Settings, LayoutGrid, BarChart3, ListChecks, ClipboardList, BookOpen, BrainCircuit, MessageSquareQuestion, Users, GraduationCap } from 'lucide-react';
+import { User, Settings, LayoutGrid, BarChart3, ListChecks, GraduationCap } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById, getAllStudents } from '@/lib/mock-data';
 import type { Student } from '@/lib/types';
@@ -79,13 +79,26 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
           </Link>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/class') || pathname === '/dashboard' && userRole === 'teacher'} tooltip={{children: 'Teacher Dashboard'}}>
-                <Link href={'/dashboard/class'}><LayoutGrid /><span>Teacher Dashboard</span></Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <SidebarGroup>
+            <SidebarGroupLabel>Teacher Dashboard</SidebarGroupLabel>
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/class'}>
+                        <Link href="/dashboard/class"><LayoutGrid /><span>Class</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/performance'}>
+                        <Link href="/dashboard/performance"><BarChart3 /><span>Performance</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/activity'}>
+                        <Link href="/dashboard/activity"><ListChecks /><span>Activity</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
           <SidebarSeparator />
            <SidebarGroup>
                 <SidebarGroupLabel>Students</SidebarGroupLabel>
