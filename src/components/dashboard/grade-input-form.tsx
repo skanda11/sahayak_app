@@ -155,83 +155,87 @@ export default function GradeInputForm() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <FormField
-                    control={form.control}
-                    name="rollNumber"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Student Roll Number</FormLabel>
-                            <FormControl>
-                                <div className="relative">
-                                    <Input 
-                                      placeholder="e.g., R001" 
-                                      {...field} 
-                                      onChange={(e) => {
-                                        field.onChange(e);
-                                        debounced(e.target.value);
-                                      }}
-                                    />
-                                    {isSearching && <Loader2 className="absolute right-2 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />}
-                                </div>
-                            </FormControl>
-                             <FormMessage />
-                             {foundStudentName && (
-                                <p className="text-sm text-green-600 font-medium mt-1">Found: {foundStudentName}</p>
-                            )}
-                        </FormItem>
-                    )}
-                />
-                 {isNewStudent && (
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                         control={form.control}
-                        name="studentName"
+                        name="rollNumber"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>New Student Name</FormLabel>
+                                <FormLabel>Student Roll Number</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="Enter the new student's full name" {...field} />
+                                    <div className="relative">
+                                        <Input 
+                                        placeholder="e.g., R001" 
+                                        {...field} 
+                                        onChange={(e) => {
+                                            field.onChange(e);
+                                            debounced(e.target.value);
+                                        }}
+                                        />
+                                        {isSearching && <Loader2 className="absolute right-2 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />}
+                                    </div>
+                                </FormControl>
+                                <FormMessage />
+                                {foundStudentName && !isNewStudent && (
+                                    <p className="text-sm text-green-600 font-medium mt-1">Found: {foundStudentName}</p>
+                                )}
+                            </FormItem>
+                        )}
+                    />
+                    {isNewStudent && (
+                        <FormField
+                            control={form.control}
+                            name="studentName"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>New Student Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="Enter the new student's full name" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    )}
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                        control={form.control}
+                        name="subjectId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Subject</FormLabel>
+                                <Select onValueChange={field.onChange} value={field.value}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a subject" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {subjects.map(subject => (
+                                            <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="grade"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Grade (%)</FormLabel>
+                                <FormControl>
+                                    <Input type="number" placeholder="e.g., 85" {...field} value={field.value ?? ''}/>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                )}
-                 <FormField
-                    control={form.control}
-                    name="subjectId"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Subject</FormLabel>
-                            <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select a subject" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {subjects.map(subject => (
-                                        <SelectItem key={subject.id} value={subject.id}>{subject.name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="grade"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Grade (%)</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="e.g., 85" {...field} value={field.value ?? ''}/>
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                </div>
                 <FormField
                     control={form.control}
                     name="feedback"
@@ -245,9 +249,11 @@ export default function GradeInputForm() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || (!foundStudentName && !isNewStudent)}>
-                    {form.formState.isSubmitting ? "Submitting..." : "Submit Grade"}
-                </Button>
+                <div className="flex justify-end">
+                    <Button type="submit" className="w-full md:w-auto" disabled={form.formState.isSubmitting || (!foundStudentName && !isNewStudent)}>
+                        {form.formState.isSubmitting ? "Submitting..." : "Submit Grade"}
+                    </Button>
+                </div>
             </form>
         </Form>
     )

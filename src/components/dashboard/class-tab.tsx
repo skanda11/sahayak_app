@@ -2,6 +2,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import GradeInputForm from "./grade-input-form";
 
 export default function ClassTab() {
   return (
@@ -9,11 +10,11 @@ export default function ClassTab() {
       <CardHeader>
         <CardTitle>Class Management</CardTitle>
         <CardDescription>
-          Define the grades and subjects for your classes.
+          Input student grades and feedback here.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p>Class management functionality will be implemented here.</p>
+      <CardContent>
+        <GradeInputForm />
       </CardContent>
     </Card>
   );

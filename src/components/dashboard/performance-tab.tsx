@@ -57,7 +57,7 @@ export default function PerformanceTab() {
                     <TableHead>Student</TableHead>
                     <TableHead>Average Grade</TableHead>
                     <TableHead>AI Insights</TableHead>
-                    <TableHead>View Dashboard</TableHead>
+                    <TableHead className="text-right">View Dashboard</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -70,7 +70,7 @@ export default function PerformanceTab() {
                             <TableCell>
                                 <AiInsights student={student} />
                             </TableCell>
-                            <TableCell>
+                            <TableCell className="text-right">
                                 <Button asChild variant="outline" size="sm">
                                     <Link href={`/dashboard?role=student&studentId=${student.id}`}>
                                         <ExternalLink className="mr-2 h-4 w-4"/>

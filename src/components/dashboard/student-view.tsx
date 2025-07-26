@@ -85,8 +85,8 @@ export default function StudentView({ student, assignments }: { student: Student
                 </Card>
                 <AiInsights student={student} />
             </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                <Card className="lg:col-span-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 xl:grid-cols-5">
+                <Card className="lg:col-span-2 xl:col-span-3">
                     <CardHeader>
                         <CardTitle>Performance Over Time</CardTitle>
                     </CardHeader>
@@ -94,7 +94,7 @@ export default function StudentView({ student, assignments }: { student: Student
                         <ProgressChart grades={student.grades} />
                     </CardContent>
                 </Card>
-                <Card className="lg:col-span-2">
+                <Card className="lg:col-span-1 xl:col-span-2">
                     <CardHeader>
                         <CardTitle>Recent Grades</CardTitle>
                     </CardHeader>
