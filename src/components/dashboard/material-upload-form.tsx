@@ -36,6 +36,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         }
 
         setIsUploading(true);
+        setUploadProgress(0);
         
         const fileId = uuidv4();
         const storageRef = ref(storage, `materials/${classId}/${subjectId}/${fileId}-${file.name}`);
@@ -55,6 +56,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                 });
                 setIsUploading(false);
                 setFile(null);
+                setUploadProgress(0);
             },
             async () => {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
@@ -73,6 +75,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
 
                 setIsUploading(false);
                 setFile(null);
+                setUploadProgress(0);
             }
         );
     }
@@ -102,9 +105,9 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                         </Button>
                     </div>
                     {isUploading && (
-                        <div className="space-y-1 text-left">
+                        <div className="space-y-1 text-left my-2">
                             <Progress value={uploadProgress} className="w-full" />
-                            <p className="text-xs text-muted-foreground">{Math.round(uploadProgress)}% uploaded</p>
+                            <p className="text-xs text-muted-foreground text-center">{Math.round(uploadProgress)}% uploaded</p>
                         </div>
                     )}
                 </div>
