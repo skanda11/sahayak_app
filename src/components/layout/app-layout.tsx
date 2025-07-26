@@ -54,8 +54,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: `/dashboard?role=teacher`, icon: Home, label: 'Teacher Dashboard' },
-    { href: `/dashboard?role=student&studentId=student-1`, icon: User, label: 'Student 1 View' },
-    { href: `/dashboard?role=student&studentId=student-2`, icon: User, label: 'Student 2 View' },
   ];
 
   const userDetails = {
