@@ -8,14 +8,13 @@ export default function DashboardPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const role = searchParams.role;
-  const studentId = searchParams.studentId;
+  const role = searchParams?.role;
+  const studentId = searchParams?.studentId;
 
   if (role === 'teacher') {
     return <TeacherView />;
   }
 
-  // The check for studentId is important
   if (role === 'student' && typeof studentId === 'string' && studentId) {
     return <StudentView studentId={studentId} />;
   }
