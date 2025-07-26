@@ -37,9 +37,8 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const studentId = searchParams.get('studentId');
 
   const [userName, setUserName] = useState('User');
-  const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
-    setIsClient(true);
     if (role === 'student' && studentId) {
         getStudentById(studentId).then(student => {
             if(student) setUserName(student.name);
@@ -57,11 +56,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   ];
 
   const getHref = (href: string) => {
-    const params = new URLSearchParams();
-    params.set('role', role);
-    if (role === 'student' && studentId) {
-        params.set('studentId', studentId);
-    }
+    const params = new URLSearchParams(searchParams);
     return `${href}?${params.toString()}`;
   }
 
@@ -69,14 +64,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
   };
-
-  if (!isClient) {
-      return (
-          <div className="flex min-h-screen items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          </div>
-      );
-  }
 
   return (
     <SidebarProvider>
@@ -139,7 +126,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {isClient ? (pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard') : ''}
+                  {pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard'}
                 </h1>
             </div>
         </header>

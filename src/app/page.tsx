@@ -90,7 +90,7 @@ export default function LoginPage() {
   };
   
   if (!isClient) {
-    return null;
+    return null; // Or a loading spinner
   }
 
   return (
@@ -101,7 +101,7 @@ export default function LoginPage() {
             <Logo className="h-16 w-16 text-primary" />
           </div>
           <h1 className="font-headline text-4xl font-bold text-primary">
-            Welcome to Sahayak
+            Welcome to AcademiaTrack
           </h1>
           <p className="mt-2 text-muted-foreground">
             Sign in to access your dashboard.
