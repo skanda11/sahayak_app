@@ -48,13 +48,13 @@ export default function LoginPage() {
       let role = 'student'; // Default to student
       let studentId = '';
 
-      if (emailUsername.includes('admin')) {
+      if (emailUsername === 'admin') {
         role = 'admin';
       } else if (isTeacherEmail(email)) {
         role = 'teacher';
       } else {
         // Assuming student emails are like 'student-1@example.com', 'student-2@example.com', etc.
-        const match = emailUsername.match(/student-(\d+)/);
+        const match = emailUsername.match(/^student-(\d+)$/);
         if (match) {
           studentId = `student-${match[1]}`;
         }
@@ -71,9 +71,7 @@ export default function LoginPage() {
 
     } catch (error: any) {
         let description = "An unknown error occurred.";
-        if (error.code === 'auth/user-not-found') {
-            description = "This user does not exist. Please check the email or sign up.";
-        } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             description = "Invalid credentials. Please check your email and password.";
         } else {
             console.error(error);
