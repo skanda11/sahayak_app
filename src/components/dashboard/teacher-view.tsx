@@ -60,13 +60,13 @@ export default async function TeacherView() {
                     <CardContent>
                          <div className="flex flex-col gap-2">
                             <Button asChild size="sm" className="w-full">
-                                <Link href="/dashboard?role=student&studentId=student-1">
+                                <Link href="/student-view?studentId=student-1">
                                     <User className="mr-2" />
                                     View as Student 1
                                 </Link>
                             </Button>
                             <Button asChild size="sm" variant="outline" className="w-full">
-                                <Link href="/dashboard?role=student&studentId=student-2">
+                                <Link href="/student-view?studentId=student-2">
                                     <User className="mr-2" />
                                     View as Student 2
                                 </Link>
