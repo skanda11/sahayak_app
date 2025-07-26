@@ -37,7 +37,7 @@ function parseQuiz(quizText: string): QuizQuestion[] {
   return questions;
 }
 
-export default function ConceptClarificationPage() {
+export default function ConceptClarifier() {
   const [concept, setConcept] = useState('');
   const [subject, setSubject] = useState('');
   const [result, setResult] = useState<{ explanation: string; quiz: QuizQuestion[] } | null>(null);

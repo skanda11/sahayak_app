@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, FileQuestion, User, Settings } from 'lucide-react';
+import { Home, LogOut, User, Settings } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById } from '@/lib/mock-data';
 
@@ -52,7 +52,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: `/dashboard`, icon: Home, label: 'Dashboard' },
-    { href: `/concept-clarification`, icon: FileQuestion, label: 'Concept Clarifier' },
   ];
 
   const getHref = (href: string) => {
@@ -126,7 +125,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard'}
+                  {pathname === '/dashboard' ? 'Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ') }
                 </h1>
             </div>
         </header>
