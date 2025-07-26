@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +12,11 @@ import { Logo } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 import { LogIn } from 'lucide-react';
 
+const auth = getAuth(app);
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('password'); // Default password for demo
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -21,7 +26,7 @@ export default function LoginPage() {
     setIsClient(true);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -35,23 +40,36 @@ export default function LoginPage() {
       return;
     }
 
-    // Simulate role-based redirection
-    let role = 'student';
-    if (email.toLowerCase() === 'teacher@example.com') {
-      role = 'teacher';
-    } else if (email.toLowerCase().includes('student')) {
-      role = 'student';
-    }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      
+      let role = 'student';
+      if (email.toLowerCase().includes('teacher')) {
+        role = 'teacher';
+      }
 
-    // Simulate API call
-    setTimeout(() => {
       toast({
         title: 'Login Successful',
         description: `Welcome! Redirecting to the ${role} dashboard.`,
         className: 'bg-accent text-accent-foreground',
       });
       router.push(`/dashboard?role=${role}`);
-    }, 1000);
+
+    } catch (error: any) {
+        let description = "An unknown error occurred.";
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            description = "Invalid credentials. Please check your email and password.";
+        } else {
+            console.error(error);
+        }
+        toast({
+            title: 'Login Failed',
+            description,
+            variant: 'destructive',
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
   
   if (!isClient) {
@@ -77,7 +95,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Use <span className="font-semibold">teacher@example.com</span> or <span className="font-semibold">student@example.com</span>
+              Use <span className="font-semibold">teacher@example.com</span> or <span className="font-semibold">student@example.com</span>. The password for all test accounts is <span className="font-semibold">password</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -91,6 +109,17 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
                 />
               </div>

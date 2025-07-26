@@ -6,7 +6,7 @@
 // In a real app, you should consider using a tool like Firebase App Check to protect your backend resources.
 // You can learn more about App Check here: https://firebase.google.com/docs/app-check
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: 'your-api-key',
   authDomain: 'your-auth-domain',
   projectId: 'your-project-id',
