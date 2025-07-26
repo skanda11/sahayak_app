@@ -95,11 +95,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarSeparator />
-              {students.length > 0 && (
-                <SidebarMenuItem>
-                  <span className="px-2 text-xs font-medium text-muted-foreground">Students</span>
-                </SidebarMenuItem>
-              )}
              {isLoading ? (
                 Array.from({ length: 3 }).map((_, index) => (
                     <SidebarMenuItem key={index}>
