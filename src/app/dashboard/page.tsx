@@ -74,8 +74,8 @@ function DashboardContent({ role }: { role?: string }) {
     if (role === 'admin') {
         return <AdminDashboard />
     }
-    // Default to student view
-    return <StudentView studentId="student-1" />;
+    // Default to teacher view
+    return <TeacherView />;
 }
 
 export default function DashboardPage({
@@ -83,7 +83,7 @@ export default function DashboardPage({
 }: {
   searchParams?: { role?: string };
 }) {
-  const role = searchParams?.role || 'student';
+  const role = searchParams?.role || 'teacher';
 
   return (
     <Suspense fallback={<DashboardSkeleton />}>
