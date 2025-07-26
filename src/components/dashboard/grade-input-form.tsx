@@ -1,3 +1,4 @@
+
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -21,9 +22,9 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import type { Student, Subject } from "@/lib/types"
+import type { Subject } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
-import { addGrade, getAllStudents, getAllSubjects } from "@/lib/mock-data"
+import { addGrade, getAllSubjects } from "@/lib/mock-data"
 import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
@@ -33,11 +34,8 @@ const formSchema = z.object({
   feedback: z.string().min(5, { message: "Feedback must be at least 5 characters." }).max(200),
 })
 
-interface GradeInputFormProps {
-    students: Student[];
-}
 
-export default function GradeInputForm({ students }: GradeInputFormProps) {
+export default function GradeInputForm() {
     const { toast } = useToast()
     const router = useRouter()
     const subjects = getAllSubjects();

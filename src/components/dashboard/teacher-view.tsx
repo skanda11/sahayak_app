@@ -1,38 +1,22 @@
 
-'use client';
-
 import { getAllStudents, getSubjectById, getAllSubjects, seedDatabase } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
-import { useEffect, useState } from "react";
 import type { Student, Subject } from "@/lib/types";
-import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
-import { Users, BookOpen, Database, User, Shield } from "lucide-react";
+import { Users, BookOpen, Database, User } from "lucide-react";
 import Link from "next/link";
+import { SeedButton } from "./seed-button";
 
 
-function TeacherViewContent({ students, subjects }: { students: Student[], subjects: Subject[] }) {
-    const { toast } = useToast();
-    const router = useRouter();
-
-    const handleSeed = async () => {
-        const result = await seedDatabase();
-        toast({
-            title: result.success ? 'Database Seeded' : 'Seeding Skipped',
-            description: result.message,
-            variant: result.success ? 'default' : 'destructive',
-            className: result.success ? "bg-accent text-accent-foreground" : "",
-        });
-        if (result.success) {
-            router.refresh();
-        }
-    };
+// This is now an async Server Component
+export default async function TeacherView() {
+    const students = await getAllStudents();
+    const subjects = getAllSubjects();
 
     return (
         <div className="flex flex-col gap-6">
@@ -64,7 +48,7 @@ function TeacherViewContent({ students, subjects }: { students: Student[], subje
                          <Database className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <Button onClick={handleSeed} size="sm" className="w-full">Seed Database</Button>
+                        <SeedButton />
                         <p className="text-xs text-muted-foreground mt-2">Add mock data if empty.</p>
                     </CardContent>
                 </Card>
@@ -153,51 +137,11 @@ function TeacherViewContent({ students, subjects }: { students: Student[], subje
                             <CardDescription>Add a new grade and feedback for a student.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <GradeInputForm students={students} />
+                            <GradeInputForm />
                         </CardContent>
                     </Card>
                 </div>
             </div>
         </div>
     );
-}
-
-function TeacherViewSkeleton() {
-    return (
-        <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-            </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2">
-                    <Skeleton className="h-[400px] w-full" />
-                </div>
-                <div>
-                    <Skeleton className="h-[400px] w-full" />
-                </div>
-            </div>
-        </div>
-    )
-}
-
-// This component remains a client component because it uses hooks,
-// but it fetches its initial data via props passed from a server component.
-export default function TeacherView() {
-    const [students, setStudents] = useState<Student[] | null>(null);
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-
-    useEffect(() => {
-        // Fetching data on the client side to allow for dynamic updates (e.g., after adding a grade)
-        getAllStudents().then(setStudents);
-        setSubjects(getAllSubjects());
-    }, []);
-
-    if (students === null) {
-        return <TeacherViewSkeleton />;
-    }
-
-    return <TeacherViewContent students={students} subjects={subjects}/>;
 }
