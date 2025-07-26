@@ -75,7 +75,7 @@ export default function ContentReview() {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="prose max-w-none p-4 border rounded-md bg-muted/50">
-                    <div dangerouslySetInnerHTML={{ __html: item.sessionContent.replace(/\n/g, '<br />') }} />
+                    <div dangerouslySetInnerHTML={{ __html: item.sessionContent }} />
                   </div>
                    {item.status === 'under-review' && (
                     <div className="text-right mt-4">

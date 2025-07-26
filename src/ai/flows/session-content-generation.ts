@@ -20,7 +20,7 @@ const GenerateSessionContentInputSchema = z.object({
 export type GenerateSessionContentInput = z.infer<typeof GenerateSessionContentInputSchema>;
 
 const GenerateSessionContentOutputSchema = z.object({
-  sessionContent: z.string().describe('The generated content for the educational session.'),
+  sessionContent: z.string().describe('The generated HTML content for the educational session.'),
 });
 export type GenerateSessionContentOutput = z.infer<typeof GenerateSessionContentOutputSchema>;
 
@@ -34,13 +34,14 @@ const sessionContentGenerationPrompt = ai.definePrompt({
   name: 'sessionContentGenerationPrompt',
   input: {schema: GenerateSessionContentInputSchema},
   output: {schema: GenerateSessionContentOutputSchema},
-  prompt: `You are an expert curriculum designer. Generate a basic, text-based educational content for the following:
+  prompt: `You are an expert curriculum designer. Generate an HTML page with educational content for the following:
 
 Grade: {{{grade}}}
 Subject: {{{subject}}}
 Topic: {{{topic}}}
 
-Provide a simple explanation of the topic suitable for the grade level.
+The HTML should be well-structured. Use <h1> for the main topic, <h2> for sub-sections, <p> for explanations, and <ul> with <li> for lists of key points or facts.
+Provide a clear and simple explanation of the topic suitable for the specified grade level.
 `,
 });
 
