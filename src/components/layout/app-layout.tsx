@@ -69,7 +69,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         <SidebarHeader>
          <Link href="/" className="flex items-center gap-2">
             <Logo className="size-8 text-primary" />
-            <span className="text-lg font-semibold">AcademiaTrack</span>
+            <span className="text-lg font-semibold">Sahayak</span>
           </Link>
         </SidebarHeader>
         <SidebarContent>

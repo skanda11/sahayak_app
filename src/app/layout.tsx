@@ -5,7 +5,7 @@ import RootLayoutClient from './layout-client';
 
 
 export const metadata: Metadata = {
-  title: 'AcademiaTrack',
+  title: 'Sahayak',
   description: 'Track your academic progress with AI-powered insights.',
 };
 

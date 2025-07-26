@@ -7,7 +7,7 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold font-headline text-primary">Welcome to AcademiaTrack</h1>
+        <h1 className="text-5xl font-bold font-headline text-primary">Welcome to Sahayak</h1>
         <p className="text-xl text-muted-foreground mt-4">Your AI-powered academic companion.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full px-4">
