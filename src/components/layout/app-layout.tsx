@@ -16,6 +16,8 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarSeparator,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -27,15 +29,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, User, Settings, LayoutGrid, BarChart3, ListChecks, ClipboardList, BookOpen, BrainCircuit, MessageSquareQuestion, Users } from 'lucide-react';
+import { Home, LogOut, User, Settings, LayoutGrid, BarChart3, ListChecks, ClipboardList, BookOpen, BrainCircuit, MessageSquareQuestion, Users, GraduationCap } from 'lucide-react';
 import { Logo } from '../icons';
-import { getStudentById } from '@/lib/mock-data';
+import { getStudentById, getAllStudents } from '@/lib/mock-data';
 import type { Student } from '@/lib/types';
 
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [students, setStudents] = useState<Student[]>([]);
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
@@ -54,6 +57,9 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         setUserRole('teacher');
         setUserName('Teacher');
       }
+
+      const allStudents = await getAllStudents();
+      setStudents(allStudents);
     }
     setup();
   }, [searchParams]);
@@ -75,21 +81,31 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/class')} tooltip={{children: 'Class'}}>
-                <Link href={'/dashboard/class'}><LayoutGrid /><span>Class</span></Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/performance')} tooltip={{children: 'Performance'}}>
-                <Link href={'/dashboard/performance'}><BarChart3 /><span>Performance</span></Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/activity')} tooltip={{children: 'Activity'}}>
-                <Link href={'/dashboard/activity'}><ListChecks /><span>Activity</span></Link>
+              <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/class') || pathname === '/dashboard' && userRole === 'teacher'} tooltip={{children: 'Teacher Dashboard'}}>
+                <Link href={'/dashboard/class'}><LayoutGrid /><span>Teacher Dashboard</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+          <SidebarSeparator />
+           <SidebarGroup>
+                <SidebarGroupLabel>Students</SidebarGroupLabel>
+                <SidebarMenu>
+                    {students.map(student => (
+                        <SidebarMenuItem key={student.id}>
+                            <SidebarMenuButton 
+                                asChild 
+                                isActive={searchParams.get('studentId') === student.id}
+                                tooltip={{children: student.name}}
+                            >
+                                <Link href={`/dashboard?role=student&studentId=${student.id}`}>
+                                    <GraduationCap />
+                                    <span>{student.name}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <DropdownMenu>
