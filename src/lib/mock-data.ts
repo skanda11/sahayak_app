@@ -47,13 +47,9 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
     },
 ];
 
-export async function addMaterial(classroom: string, subjectId: string, material: Omit<Material, 'id'> & {id: string}) {
-  const materialRef = doc(db, 'materials', classroom, subjectId, material.id);
-  await setDoc(materialRef, {
-    name: material.name,
-    url: material.url,
-    type: material.type,
-  });
+export async function addMaterial(classroom: string, subjectId: string, material: Omit<Material, 'id'>) {
+  const materialCollectionRef = collection(db, 'materials', classroom, subjectId);
+  await addDoc(materialCollectionRef, material);
 }
 
 export async function getMaterialsForSubject(classroom: string, subjectId: string): Promise<Material[]> {

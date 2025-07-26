@@ -38,8 +38,8 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         setIsUploading(true);
         setUploadProgress(0);
         
-        const fileId = uuidv4();
-        const storageRef = ref(storage, `materials/${classId}/${subjectId}/${fileId}-${file.name}`);
+        const tempId = uuidv4();
+        const storageRef = ref(storage, `materials/${classId}/${subjectId}/${tempId}-${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
 
         uploadTask.on('state_changed',
@@ -51,7 +51,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                 console.error("Upload failed:", error);
                 toast({
                     title: "Upload Failed",
-                    description: "Something went wrong during the file upload.",
+                    description: "Something went wrong during the file upload. Ensure Storage is enabled in Firebase.",
                     variant: "destructive"
                 });
                 setIsUploading(false);
@@ -61,7 +61,6 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
             async () => {
                 const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                 await addMaterial(classId, subjectId, {
-                    id: fileId,
                     name: file.name,
                     url: downloadURL,
                     type: 'reference'
