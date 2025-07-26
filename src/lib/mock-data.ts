@@ -45,6 +45,12 @@ export const students: Student[] = [
   },
 ];
 
+const teacherEmails = ['teacher@example.com'];
+
+export function isTeacherEmail(email: string): boolean {
+  return teacherEmails.includes(email.toLowerCase());
+}
+
 export function getStudentById(id: string): Student | undefined {
   return students.find((s) => s.id === id);
 }

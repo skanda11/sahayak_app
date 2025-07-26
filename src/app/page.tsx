@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
 import { LogIn } from 'lucide-react';
+import { isTeacherEmail } from '@/lib/mock-data';
 
 const auth = getAuth(app);
 
@@ -44,11 +45,11 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       
       const emailUsername = email.split('@')[0].toLowerCase();
-      let role = 'student';
-      if (emailUsername.includes('_teacher')) {
-        role = 'teacher';
-      } else if (emailUsername.includes('_admin')) {
+      let role = 'student'; // Default to student
+      if (emailUsername.includes('_admin')) {
         role = 'admin';
+      } else if (isTeacherEmail(email)) {
+        role = 'teacher';
       }
 
       toast({
@@ -101,7 +102,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-                Use an email like <span className="font-semibold">name_teacher@example.com</span>, <span className="font-semibold">name_student@example.com</span>, or <span className="font-semibold">name_admin@example.com</span>. The password is <span className="font-semibold">password</span>.
+                Use an email like <span className="font-semibold">student@example.com</span>, <span className="font-semibold">teacher@example.com</span>, or <span className="font-semibold">admin@example.com</span>. The password is <span className="font-semibold">password</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>
