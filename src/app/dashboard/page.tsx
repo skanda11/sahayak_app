@@ -1,16 +1,45 @@
-import { Suspense } from 'react';
+
+'use client';
+
+import { Suspense, useState } from 'react';
 import StudentView from '@/components/dashboard/student-view';
 import TeacherView from '@/components/dashboard/teacher-view';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { User, Shield, Users, BookOpen } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getAllStudents, getAllSubjects } from '@/lib/mock-data';
+import { User, Shield, Users, BookOpen, Database } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { getAllStudents, getAllSubjects, seedDatabase } from '@/lib/mock-data';
+import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
-async function AdminDashboard() {
-    const students = await getAllStudents();
-    const subjects = getAllSubjects();
+
+function AdminDashboard() {
+    const [students, setStudents] = useState<any[]>([]);
+    const [subjects, setSubjects] = useState<any[]>([]);
+    const { toast } = useToast();
+    const router = useRouter();
+
+    useState(() => {
+        getAllStudents().then(setStudents);
+        setSubjects(getAllSubjects());
+    });
+    
+    const handleSeed = async () => {
+        const result = await seedDatabase();
+        toast({
+            title: result.success ? 'Database Seeded' : 'Seeding Skipped',
+            description: result.message,
+            variant: result.success ? 'default' : 'destructive',
+            className: result.success ? "bg-accent text-accent-foreground" : "",
+        });
+        if (result.success) {
+            const latestStudents = await getAllStudents();
+            setStudents(latestStudents);
+            router.refresh();
+        }
+    };
+
 
     return (
         <div className="flex flex-col gap-6">
@@ -36,11 +65,22 @@ async function AdminDashboard() {
                         <p className="text-xs text-muted-foreground">subjects offered</p>
                     </CardContent>
                 </Card>
+                 <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">Database Actions</CardTitle>
+                         <Database className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <Button onClick={handleSeed} size="sm" className="w-full">Seed Database</Button>
+                        <p className="text-xs text-muted-foreground mt-2">Add mock data if empty.</p>
+                    </CardContent>
+                </Card>
             </div>
             <div>
                 <Card>
                     <CardHeader>
                         <CardTitle>Dashboard Navigation</CardTitle>
+                        <CardDescription>Switch between different user roles to see their views.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4 md:flex-row">
                         <Button asChild size="lg" className="w-full md:w-auto">
@@ -74,8 +114,8 @@ function DashboardContent({ role }: { role?: string }) {
     if (role === 'admin') {
         return <AdminDashboard />
     }
-    // Default to student view if role is not specified
-    return <StudentView studentId="student-1" />;
+    // Default to admin view if role is not specified
+    return <AdminDashboard />;
 }
 
 export default function DashboardPage({
