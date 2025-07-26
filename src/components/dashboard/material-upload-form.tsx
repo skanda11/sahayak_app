@@ -6,10 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { UploadCloud, File, X } from "lucide-react";
-import { addMaterial } from "@/lib/mock-data";
+import { createMaterialRef, updateMaterial } from "@/lib/mock-data";
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { v4 as uuidv4 } from 'uuid';
 import { Progress } from "../ui/progress";
 
 export default function MaterialUploadForm({ classId, subjectId }: { classId: string, subjectId: string }) {
@@ -38,45 +37,63 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         setIsUploading(true);
         setUploadProgress(0);
         
-        const tempId = uuidv4();
-        const storageRef = ref(storage, `materials/${classId}/${subjectId}/${tempId}-${file.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        try {
+            // 1. Create a document reference in Firestore first to get a unique ID
+            const materialRef = await createMaterialRef(classId, subjectId);
+            const materialId = materialRef.id;
 
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadProgress(progress);
-            },
-            (error) => {
-                console.error("Upload failed:", error);
+            // 2. Use that unique ID to create the path in Firebase Storage
+            const storageRef = ref(storage, `materials/${classId}/${subjectId}/${materialId}-${file.name}`);
+            const uploadTask = uploadBytesResumable(storageRef, file);
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setUploadProgress(progress);
+                },
+                (error) => {
+                    console.error("Upload failed:", error);
+                    toast({
+                        title: "Upload Failed",
+                        description: "Something went wrong during the file upload. Ensure Storage is enabled in Firebase.",
+                        variant: "destructive"
+                    });
+                    setIsUploading(false);
+                    setFile(null);
+                    setUploadProgress(0);
+                },
+                async () => {
+                    // 3. Get the download URL and update the Firestore document
+                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    await updateMaterial(materialRef, {
+                        id: materialId,
+                        name: file.name,
+                        url: downloadURL,
+                        type: 'reference'
+                    });
+
+                    toast({
+                        title: "Upload Successful!",
+                        description: `${file.name} has been uploaded.`,
+                        className: "bg-accent text-accent-foreground"
+                    });
+
+                    setIsUploading(false);
+                    setFile(null);
+                    setUploadProgress(0);
+                }
+            );
+        } catch (error) {
+             console.error("Firestore operation failed:", error);
                 toast({
                     title: "Upload Failed",
-                    description: "Something went wrong during the file upload. Ensure Storage is enabled in Firebase.",
+                    description: "Could not create a database record. Ensure Firestore is enabled.",
                     variant: "destructive"
                 });
-                setIsUploading(false);
-                setFile(null);
-                setUploadProgress(0);
-            },
-            async () => {
-                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                await addMaterial(classId, subjectId, {
-                    name: file.name,
-                    url: downloadURL,
-                    type: 'reference'
-                });
-
-                toast({
-                    title: "Upload Successful!",
-                    description: `${file.name} has been uploaded.`,
-                    className: "bg-accent text-accent-foreground"
-                });
-
-                setIsUploading(false);
-                setFile(null);
-                setUploadProgress(0);
-            }
-        );
+            setIsUploading(false);
+            setFile(null);
+            setUploadProgress(0);
+        }
     }
 
     return (
