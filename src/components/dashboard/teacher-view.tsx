@@ -98,7 +98,7 @@ export default function TeacherView() {
     return (
         <div className="flex flex-col gap-6">
             <h1 className="text-3xl font-bold font-headline">Teacher Dashboard</h1>
-             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Students</CardTitle>
@@ -117,38 +117,6 @@ export default function TeacherView() {
                     <CardContent>
                         <div className="text-2xl font-bold">{studentsWithPendingAssignments}</div>
                         <p className="text-xs text-muted-foreground">students have open assignments</p>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Database Actions</CardTitle>
-                         <Database className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <SeedButton />
-                        <p className="text-xs text-muted-foreground mt-2">Add mock data if empty.</p>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Quick Views</CardTitle>
-                         <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                         <div className="flex flex-col gap-2">
-                            <Button asChild size="sm" className="w-full">
-                                <Link href="/dashboard?role=student&studentId=student-1">
-                                    <User className="mr-2" />
-                                    View as Student 1
-                                </Link>
-                            </Button>
-                            <Button asChild size="sm" variant="outline" className="w-full">
-                                <Link href="/dashboard?role=student&studentId=student-2">
-                                    <User className="mr-2" />
-                                    View as Student 2
-                                </Link>
-                            </Button>
-                        </div>
                     </CardContent>
                 </Card>
             </div>
