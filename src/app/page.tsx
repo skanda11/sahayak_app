@@ -46,7 +46,7 @@ export default function LoginPage() {
       
       const emailUsername = email.split('@')[0].toLowerCase();
       let role = 'student'; // Default to student
-      if (emailUsername.includes('_admin')) {
+      if (emailUsername.includes('admin')) {
         role = 'admin';
       } else if (isTeacherEmail(email)) {
         role = 'teacher';
