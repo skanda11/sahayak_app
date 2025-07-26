@@ -31,14 +31,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { User, Settings, LayoutGrid, BarChart3, ListChecks, GraduationCap } from 'lucide-react';
 import { Logo } from '../icons';
-import { getStudentById, getAllStudents } from '@/lib/mock-data';
-import type { Student } from '@/lib/types';
+import { getStudentById } from '@/lib/mock-data';
 
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [students, setStudents] = useState<Student[]>([]);
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
@@ -57,9 +55,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         setUserRole('teacher');
         setUserName('Teacher');
       }
-
-      const allStudents = await getAllStudents();
-      setStudents(allStudents);
     }
     setup();
   }, [searchParams]);
@@ -99,26 +94,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
-          <SidebarSeparator />
-           <SidebarGroup>
-                <SidebarGroupLabel>Students</SidebarGroupLabel>
-                <SidebarMenu>
-                    {students.map(student => (
-                        <SidebarMenuItem key={student.id}>
-                            <SidebarMenuButton 
-                                asChild 
-                                isActive={searchParams.get('studentId') === student.id}
-                                tooltip={{children: student.name}}
-                            >
-                                <Link href={`/dashboard?role=student&studentId=${student.id}`}>
-                                    <GraduationCap />
-                                    <span>{student.name}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <DropdownMenu>
