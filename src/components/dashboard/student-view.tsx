@@ -1,28 +1,33 @@
 
-'use client';
-
 import { getStudentById, getSubjectById } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
 import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import type { Student } from '@/lib/types';
-import { Skeleton } from '../ui/skeleton';
 import ConceptClarifier from '../concept-clarification/concept-clarifier';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 
-function StudentViewContent({ student }: { student: Student }) {
+// This is now an async Server Component
+export default async function StudentView({ studentId }: { studentId: string }) {
+  const student = await getStudentById(studentId);
+
+  if (!student) {
+    return <div>Student not found.</div>;
+  }
+
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
-  const latestGrades = student.grades.slice(-2);
+  
+  // Sort grades by date to get the latest for trend calculation
+  const sortedGradesByDate = [...student.grades].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const latestGrades = sortedGradesByDate.slice(-2);
   const gradeTrend = latestGrades.length > 1 ? latestGrades[1].grade - latestGrades[0].grade : 0;
   
-  const sortedGrades = [...student.grades].sort((a, b) => b.grade - a.grade);
-  const bestSubjectId = sortedGrades.length > 0 ? sortedGrades[0].subjectId : null;
+  const sortedGradesByScore = [...student.grades].sort((a, b) => b.grade - a.grade);
+  const bestSubjectId = sortedGradesByScore.length > 0 ? sortedGradesByScore[0].subjectId : null;
   const bestSubject = bestSubjectId ? getSubjectById(bestSubjectId) : null;
-
 
   return (
     <Tabs defaultValue="dashboard">
@@ -85,7 +90,7 @@ function StudentViewContent({ student }: { student: Student }) {
                         <CardTitle>Recent Grades</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <GradesTable grades={student.grades.slice(-5).reverse()} />
+                        <GradesTable grades={sortedGradesByDate.slice(-5).reverse()} />
                     </CardContent>
                 </Card>
             </div>
@@ -96,39 +101,4 @@ function StudentViewContent({ student }: { student: Student }) {
       </TabsContent>
     </Tabs>
   );
-}
-
-function StudentViewSkeleton() {
-    return (
-        <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-            </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                <Skeleton className="lg:col-span-3 h-80 w-full" />
-                <Skeleton className="lg:col-span-2 h-80 w-full" />
-            </div>
-        </div>
-    )
-}
-
-export default function StudentView({ studentId }: { studentId: string }) {
-    const [student, setStudent] = useState<Student | null | undefined>(null);
-
-    useEffect(() => {
-        getStudentById(studentId).then(setStudent);
-    }, [studentId]);
-
-    if (student === null) {
-        return <StudentViewSkeleton />;
-    }
-
-    if (student === undefined) {
-        return <div>Student not found.</div>;
-    }
-
-    return <StudentViewContent student={student} />;
 }

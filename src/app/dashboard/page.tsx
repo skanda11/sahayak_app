@@ -1,50 +1,29 @@
 
-'use client';
-
-import { Suspense } from 'react';
 import StudentView from '@/components/dashboard/student-view';
 import TeacherView from '@/components/dashboard/teacher-view';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useSearchParams } from 'next/navigation';
 
+// This is now a Server Component
+export default function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const role = searchParams.role;
+  const studentId = searchParams.studentId;
 
-function DashboardContent() {
-    const searchParams = useSearchParams();
-    const role = searchParams.get('role');
-    const studentId = searchParams.get('studentId');
+  if (role === 'teacher') {
+    return <TeacherView />;
+  }
 
-    if (role === 'teacher') {
-      return <TeacherView />;
-    }
-    
-    if (role === 'student' && studentId) {
-        return <StudentView studentId={studentId} />;
-    }
-    
-    // Fallback skeleton while search params are resolving on the client
-    return <DashboardSkeleton />;
-}
+  // The check for studentId is important
+  if (role === 'student' && typeof studentId === 'string' && studentId) {
+    return <StudentView studentId={studentId} />;
+  }
 
-export default function DashboardPage() {
+  // Fallback if role/studentId is missing
   return (
-    <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardContent />
-    </Suspense>
+    <div className="flex items-center justify-center h-full">
+      <p className="text-muted-foreground">Please log in to view your dashboard.</p>
+    </div>
   );
-}
-
-function DashboardSkeleton() {
-    return (
-        <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-            </div>
-            <div className="grid gap-6 lg:grid-cols-2">
-                <Skeleton className="h-80 w-full" />
-                <Skeleton className="h-80 w-full" />
-            </div>
-        </div>
-    )
 }

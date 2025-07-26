@@ -1,3 +1,4 @@
+
 'use client';
 
 import { getAllStudents, getSubjectById, getAllSubjects, seedDatabase } from "@/lib/mock-data";
@@ -7,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
-import type { Student } from "@/lib/types";
+import type { Student, Subject } from "@/lib/types";
 import { Skeleton } from "../ui/skeleton";
 import { Button } from "../ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +17,7 @@ import { Users, BookOpen, Database, User, Shield } from "lucide-react";
 import Link from "next/link";
 
 
-function TeacherViewContent({ students, subjects }: { students: Student[], subjects: any[] }) {
+function TeacherViewContent({ students, subjects }: { students: Student[], subjects: Subject[] }) {
     const { toast } = useToast();
     const router = useRouter();
 
@@ -111,7 +112,7 @@ function TeacherViewContent({ students, subjects }: { students: Student[], subje
                                         const averageGrade = student.grades.length > 0 
                                             ? student.grades.reduce((acc, g) => acc + g.grade, 0) / student.grades.length
                                             : 0;
-                                        const latestGrade = student.grades.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+                                        const latestGrade = [...student.grades].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                                         const latestSubject = latestGrade ? getSubjectById(latestGrade.subjectId) : null;
 
                                         return (
@@ -182,11 +183,14 @@ function TeacherViewSkeleton() {
     )
 }
 
+// This component remains a client component because it uses hooks,
+// but it fetches its initial data via props passed from a server component.
 export default function TeacherView() {
     const [students, setStudents] = useState<Student[] | null>(null);
-    const [subjects, setSubjects] = useState<any[]>([]);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
 
     useEffect(() => {
+        // Fetching data on the client side to allow for dynamic updates (e.g., after adding a grade)
         getAllStudents().then(setStudents);
         setSubjects(getAllSubjects());
     }, []);
