@@ -54,7 +54,7 @@ export default function LoginPage() {
 
       toast({
         title: 'Login Successful',
-        description: `Welcome!`,
+        description: `Welcome! Redirecting to your dashboard.`,
         className: 'bg-accent text-accent-foreground',
       });
       

@@ -11,7 +11,7 @@ import { User, Shield, Users, BookOpen, Database } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { getAllStudents, getAllSubjects, seedDatabase } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 
 function AdminDashboard() {
@@ -103,31 +103,24 @@ function AdminDashboard() {
 }
 
 
-function DashboardContent({ role }: { role?: string }) {
+function DashboardContent() {
+    const searchParams = useSearchParams();
+    const role = searchParams.get('role');
+
     if (role === 'teacher') {
       return <TeacherView />;
     }
     if (role === 'student') {
         return <StudentView studentId="student-1" />;
     }
-    // Admin view
-    if (role === 'admin') {
-        return <AdminDashboard />
-    }
-    // Default to admin view if role is not specified
+    
     return <AdminDashboard />;
 }
 
-export default function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { role?: string };
-}) {
-  const role = searchParams?.role;
-
+export default function DashboardPage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardContent role={role} />
+        <DashboardContent />
     </Suspense>
   );
 }
