@@ -20,6 +20,7 @@ function DashboardContent() {
         return <StudentView studentId={studentId} />;
     }
     
+    // Fallback skeleton while search params are resolving on the client
     return <DashboardSkeleton />;
 }
 
