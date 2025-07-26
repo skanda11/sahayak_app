@@ -47,9 +47,10 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
     }
 
     return (
-        <div className="mt-4 rounded-lg border border-dashed border-muted-foreground/50 p-4">
+        <div className="rounded-lg border border-dashed p-4 flex flex-col justify-center items-center text-center">
+            <h4 className="font-semibold mb-2">Upload New Material</h4>
             {!file ? (
-                <div className="flex flex-col items-center justify-center space-y-2">
+                <div className="flex flex-col items-center justify-center space-y-2 py-4">
                     <UploadCloud className="h-10 w-10 text-muted-foreground" />
                     <label htmlFor="file-upload" className="cursor-pointer text-sm font-medium text-primary hover:underline">
                         Choose a file to upload
@@ -58,18 +59,20 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                     <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} />
                 </div>
             ) : (
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                         <File className="h-6 w-6 text-muted-foreground" />
-                         <span className="text-sm font-medium">{file.name}</span>
-                         <span className="text-xs text-muted-foreground">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                <div className="w-full">
+                    <div className="flex items-center justify-between p-2 rounded-md border bg-muted/50 my-2">
+                        <div className="flex items-center gap-2 truncate">
+                             <File className="h-6 w-6 text-muted-foreground flex-shrink-0" />
+                             <span className="text-sm font-medium truncate">{file.name}</span>
+                             <span className="text-xs text-muted-foreground whitespace-nowrap">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                        </div>
+                        <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="h-6 w-6">
+                            <X className="h-4 w-4" />
+                        </Button>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setFile(null)}>
-                        <X className="h-4 w-4" />
-                    </Button>
                 </div>
             )}
-            <Button onClick={handleUpload} disabled={!file || isUploading} className="w-full mt-4">
+            <Button onClick={handleUpload} disabled={!file || isUploading} className="w-full mt-2">
                 {isUploading ? "Uploading..." : "Upload Material"}
             </Button>
         </div>
