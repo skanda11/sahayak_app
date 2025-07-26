@@ -39,9 +39,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   ];
 
   const getHref = (href: string) => {
-    // For admin, the dashboard link should not have a role, to show the selection screen
-    const roleParam = role === 'admin' && href.includes('dashboard') ? 'admin' : role;
-    return `${href}?role=${roleParam}`;
+    return `${href}?role=${role}`;
   }
 
   const getUserDetails = () => {
@@ -57,6 +55,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   }
 
   const userDetails = getUserDetails();
+  const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
 
   return (
     <SidebarProvider>
@@ -73,7 +72,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname.startsWith(item.href)}
+                  isActive={currentPath.startsWith(getHref(item.href))}
                   tooltip={{
                     children: item.label,
                   }}
@@ -85,19 +84,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
-             {role === 'admin' && (
-                <SidebarMenuItem>
-                    <SidebarMenuButton
-                        asChild
-                        isActive={pathname.startsWith('/dashboard') && searchParams.get('role') === 'teacher'}
-                        >
-                        <Link href="/dashboard?role=teacher">
-                            <Shield />
-                            <span>Teacher View</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-             )}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -132,7 +118,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                    {pathname.split('/').pop()?.replace(/-/g, ' ')}
+                  {role === 'admin' && pathname.includes('dashboard') ? 'Admin Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ')}
                 </h1>
             </div>
         </header>

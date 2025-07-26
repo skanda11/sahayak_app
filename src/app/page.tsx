@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn, User, Shield, ArrowRight } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 const auth = getAuth(app);
 
@@ -18,8 +18,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('password'); // Default password for demo
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -51,7 +49,6 @@ export default function LoginPage() {
         role = 'teacher';
       } else if (emailUsername.includes('_admin')) {
         role = 'admin';
-        setIsAdmin(true);
       }
 
       toast({
@@ -60,11 +57,7 @@ export default function LoginPage() {
         className: 'bg-accent text-accent-foreground',
       });
       
-      if (role === 'admin') {
-        setIsLoggedIn(true);
-      } else {
-        router.push(`/dashboard?role=${role}`);
-      }
+      router.push(`/dashboard?role=${role}`);
 
     } catch (error: any) {
         let description = "An unknown error occurred.";
@@ -98,37 +91,19 @@ export default function LoginPage() {
             Welcome to AcademiaTrack
           </h1>
           <p className="mt-2 text-muted-foreground">
-            {isLoggedIn && isAdmin ? "Choose a dashboard to view." : "Sign in to access your dashboard."}
+            Sign in to access your dashboard.
           </p>
         </header>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">{isLoggedIn && isAdmin ? "Admin Navigation" : "Login"}</CardTitle>
-            {!isLoggedIn && (
-              <CardDescription>
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
                 Use an email like <span className="font-semibold">name_teacher@example.com</span>, <span className="font-semibold">name_student@example.com</span>, or <span className="font-semibold">name_admin@example.com</span>. The password is <span className="font-semibold">password</span>.
-              </CardDescription>
-            )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoggedIn && isAdmin ? (
-                <div className="space-y-4">
-                    <Button onClick={() => router.push('/dashboard?role=student')} className="w-full justify-between" size="lg">
-                        <span>Student Dashboard</span>
-                        <User />
-                    </Button>
-                    <Button onClick={() => router.push('/dashboard?role=teacher')} className="w-full justify-between" size="lg" variant="secondary">
-                        <span>Teacher Dashboard</span>
-                        <Shield />
-                    </Button>
-                     <Button onClick={() => setIsLoggedIn(false)} className="w-full" variant="outline">
-                        <LogIn className="mr-2" />
-                        Back to Login
-                    </Button>
-                </div>
-            ) : (
-                <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -162,8 +137,7 @@ export default function LoginPage() {
                     </>
                     )}
                 </Button>
-                </form>
-            )}
+            </form>
           </CardContent>
         </Card>
       </div>
