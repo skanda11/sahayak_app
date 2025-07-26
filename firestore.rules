@@ -1,0 +1,29 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Students collection and subcollections
+    match /students/{studentId} {
+      // Allow anyone to read and write student data for now.
+      // In a real app, you would restrict this to authenticated users.
+      allow read, write: if true;
+
+      match /grades/{gradeId} {
+        allow read, write: if true;
+      }
+
+      match /assignments/{assignmentId} {
+        allow read, write: if true;
+      }
+    }
+
+    // Materials collection and subcollections
+    match /materials/{classId}/{subjectId}/{materialId} {
+      // Allow anyone to read and write materials.
+      // In a real app, you might restrict writes to teachers.
+      allow read, write: if true;
+    }
+  }
+}
