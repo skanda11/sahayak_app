@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -9,6 +10,7 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {googleAI} from '@genkit-ai/googleai';
 import {z} from 'genkit';
 
 const GenerateSessionContentInputSchema = z.object({
@@ -33,6 +35,7 @@ const sessionContentGenerationPrompt = ai.definePrompt({
   name: 'sessionContentGenerationPrompt',
   input: {schema: GenerateSessionContentInputSchema},
   output: {schema: GenerateSessionContentOutputSchema},
+  model: googleAI.model('gemini-pro'),
   prompt: `You are an expert curriculum designer and educator. Your task is to generate detailed session content for a specific topic, subject, and grade level.
 
 The content should be engaging, informative, and tailored to the complexity appropriate for the specified grade.
