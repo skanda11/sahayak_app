@@ -43,8 +43,9 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       
+      const emailUsername = email.split('@')[0].toLowerCase();
       let role = 'student';
-      if (email.toLowerCase().includes('teacher')) {
+      if (emailUsername.includes('_teacher')) {
         role = 'teacher';
       }
 
@@ -95,7 +96,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-              Use <span className="font-semibold">teacher@example.com</span> or <span className="font-semibold">student@example.com</span>. The password for all test accounts is <span className="font-semibold">password</span>.
+              Use an email ending with <span className="font-semibold">_teacher@example.com</span> or <span className="font-semibold">_student@example.com</span>. The password for all test accounts is <span className="font-semibold">password</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>
