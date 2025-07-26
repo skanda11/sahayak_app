@@ -15,6 +15,7 @@ import {
   SidebarFooter,
   SidebarInset,
   SidebarTrigger,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Home, LogOut, User, Settings, Users, BookOpen, ClipboardList } from 'lucide-react';
 import { Logo } from '../icons';
-import { getStudentById } from '@/lib/mock-data';
+import { getStudentById, getAllStudents } from '@/lib/mock-data';
+import type { Student } from '@/lib/types';
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -36,6 +38,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
+  const [students, setStudents] = useState<Student[]>([]);
 
   useEffect(() => {
     const role = searchParams.get('role');
@@ -52,6 +55,14 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
       setUserName('Teacher');
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    async function fetchStudents() {
+      const allStudents = await getAllStudents();
+      setStudents(allStudents);
+    }
+    fetchStudents();
+  }, []);
 
   const userDetails = {
     name: userName,
@@ -72,7 +83,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === '/dashboard'}
+                isActive={pathname === '/dashboard' && userRole === 'teacher'}
                 tooltip={{
                   children: 'Teacher Dashboard',
                 }}
@@ -83,6 +94,28 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+             <SidebarSeparator />
+              {students.length > 0 && (
+                <SidebarMenuItem>
+                  <span className="px-2 text-xs font-medium text-muted-foreground">Students</span>
+                </SidebarMenuItem>
+              )}
+             {students.map((student) => (
+              <SidebarMenuItem key={student.id}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={searchParams.get('studentId') === student.id}
+                  tooltip={{
+                    children: student.name,
+                  }}
+                >
+                  <Link href={`/dashboard?role=student&studentId=${student.id}`}>
+                    <User />
+                    <span>{student.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -113,7 +146,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {pathname.startsWith('/grades') ? 'Student Grades' : `${userRole} Dashboard`}
+                  {`${userRole} Dashboard`}
                 </h1>
             </div>
         </header>
