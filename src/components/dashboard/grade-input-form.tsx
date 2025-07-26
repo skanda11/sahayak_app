@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { Student, Subject } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
-import { addGrade } from "@/lib/mock-data"
+import { addGrade, getAllSubjects } from "@/lib/mock-data"
 import { useRouter } from "next/navigation"
 
 const formSchema = z.object({
@@ -35,12 +35,12 @@ const formSchema = z.object({
 
 interface GradeInputFormProps {
     students: Student[];
-    subjects: Subject[];
 }
 
-export default function GradeInputForm({ students, subjects }: GradeInputFormProps) {
+export default function GradeInputForm({ students }: GradeInputFormProps) {
     const { toast } = useToast()
     const router = useRouter()
+    const subjects = getAllSubjects();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),

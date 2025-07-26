@@ -1,4 +1,4 @@
-import { getAllStudents, getAllSubjects, getSubjectById } from "@/lib/mock-data";
+import { getAllStudents, getSubjectById } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 
 export default function TeacherView() {
     const students = getAllStudents();
-    const subjects = getAllSubjects();
 
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -72,7 +71,7 @@ export default function TeacherView() {
                         <CardDescription>Add a new grade and feedback for a student.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <GradeInputForm students={students} subjects={subjects} />
+                        <GradeInputForm students={students} />
                     </CardContent>
                 </Card>
             </div>

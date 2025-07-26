@@ -3,12 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
-import { Badge } from '../ui/badge';
 import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
 
 export default function StudentView({ studentId }: { studentId: string }) {
   const student = getStudentById(studentId);
-  const subjects = getAllSubjects();
 
   if (!student) {
     return <div>Student not found.</div>;
@@ -67,7 +65,7 @@ export default function StudentView({ studentId }: { studentId: string }) {
                     <CardTitle>Performance Over Time</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ProgressChart grades={student.grades} subjects={subjects} />
+                    <ProgressChart grades={student.grades} />
                 </CardContent>
             </Card>
             <Card className="lg:col-span-2">

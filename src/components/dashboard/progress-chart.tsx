@@ -2,15 +2,15 @@
 
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { Grade, Subject } from '@/lib/types';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useMemo } from 'react';
+import { getAllSubjects } from '@/lib/mock-data';
 
 interface ProgressChartProps {
   grades: Grade[];
-  subjects: Subject[];
 }
 
-export function ProgressChart({ grades, subjects }: ProgressChartProps) {
+export function ProgressChart({ grades }: ProgressChartProps) {
+  const subjects = getAllSubjects();
   const data = useMemo(() => {
     const dataByDate: { [date: string]: any } = {};
     grades.forEach(grade => {
