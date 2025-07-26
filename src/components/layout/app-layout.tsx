@@ -16,8 +16,6 @@ import {
   SidebarInset,
   SidebarTrigger,
   SidebarSeparator,
-  SidebarGroup,
-  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -31,7 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Home, LogOut, User, Settings, LayoutGrid, BarChart3, ListChecks, ClipboardList, BookOpen, BrainCircuit, MessageSquareQuestion, Users } from 'lucide-react';
 import { Logo } from '../icons';
-import { getAllStudents, getStudentById } from '@/lib/mock-data';
+import { getStudentById } from '@/lib/mock-data';
 import type { Student } from '@/lib/types';
 
 
@@ -41,16 +39,12 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
-  const [students, setStudents] = useState<Student[]>([]);
-
+  
   useEffect(() => {
     async function setup() {
       const role = searchParams.get('role');
       const studentId = searchParams.get('studentId');
       
-      const allStudents = await getAllStudents();
-      setStudents(allStudents);
-
       if (role === 'student' && studentId) {
         setUserRole('student');
         const student = await getStudentById(studentId);
@@ -95,23 +89,16 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 <Link href={'/dashboard/activity'}><ListChecks /><span>Activity</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-
             <SidebarSeparator />
-            
-            <SidebarGroup>
-                <SidebarGroupLabel>Students</SidebarGroupLabel>
-            </SidebarGroup>
 
-            {students.map(student => (
-                <SidebarMenuItem key={student.id}>
-                    <SidebarMenuButton asChild isActive={searchParams.get('studentId') === student.id} tooltip={{children: student.name}}>
-                        <Link href={`/dashboard?role=student&studentId=${student.id}`}>
-                            <User />
-                            <span>{student.name}</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-            ))}
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard') && (searchParams.get('role') === 'student' || !searchParams.get('role'))} tooltip={{children: 'Student Dashboard'}}>
+                    <Link href={`/dashboard?role=student&studentId=student-1`}>
+                        <User />
+                        <span>Student View</span>
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
 
           </SidebarMenu>
         </SidebarContent>
