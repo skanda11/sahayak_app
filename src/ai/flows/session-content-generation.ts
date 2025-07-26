@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview An AI agent that generates educational session content based on a topic, class, and subject.
+ * @fileOverview An AI agent that generates educational session content based on a topic, grade, and subject.
  *
  * - generateSessionContent - A function that handles the session content generation process.
  * - GenerateSessionContentInput - The input type for the generateSessionContent function.
