@@ -48,9 +48,7 @@ export default function LoginPage() {
       let role = 'student'; // Default to student
       let studentId = '';
 
-      if (emailUsername === 'admin') {
-        role = 'admin';
-      } else if (isTeacherEmail(email)) {
+      if (isTeacherEmail(email)) {
         role = 'teacher';
       } else {
         // Assuming student emails are like 'student-1@example.com', 'student-2@example.com', etc.
@@ -109,7 +107,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-                Use an email like <span className="font-semibold">student-1@example.com</span>, <span className="font-semibold">teacher1@example.com</span>, or <span className="font-semibold">admin@example.com</span>. The password is <span className="font-semibold">password</span>.
+                Use an email like <span className="font-semibold">student-1@example.com</span> or <span className="font-semibold">teacher1@example.com</span>. The password is <span className="font-semibold">password</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>

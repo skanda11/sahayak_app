@@ -25,18 +25,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, FileQuestion, User, Settings, Shield } from 'lucide-react';
+import { Home, LogOut, FileQuestion, User, Settings } from 'lucide-react';
 import { Logo } from '../icons';
+import { getStudentById } from '@/lib/mock-data';
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const role = searchParams.get('role') ?? 'student';
+  const studentId = searchParams.get('studentId');
 
+  const [userName, setUserName] = useState('User');
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    if (role === 'student' && studentId) {
+        getStudentById(studentId).then(student => {
+            if(student) setUserName(student.name);
+        })
+    } else if (role === 'teacher') {
+        setUserName('Teacher');
+    }
+
+  }, [role, studentId]);
 
 
   const navItems = [
@@ -45,22 +56,18 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   ];
 
   const getHref = (href: string) => {
-    return `${href}?role=${role}`;
-  }
-
-  const getUserDetails = () => {
-    switch(role) {
-      case 'teacher':
-        return { name: 'Dr. Smith', avatar: 'S' };
-      case 'admin':
-        return { name: 'Admin User', avatar: 'A' };
-      case 'student':
-      default:
-        return { name: 'Alex Johnson', avatar: 'A' };
+    const params = new URLSearchParams();
+    params.set('role', role);
+    if (role === 'student' && studentId) {
+        params.set('studentId', studentId);
     }
+    return `${href}?${params.toString()}`;
   }
 
-  const userDetails = getUserDetails();
+  const userDetails = {
+    name: userName,
+    avatar: userName.charAt(0).toUpperCase()
+  };
   const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
 
   return (
@@ -78,7 +85,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={currentPath.startsWith(getHref(item.href))}
+                  isActive={pathname === item.href}
                   tooltip={{
                     children: item.label,
                   }}
@@ -124,7 +131,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {isClient ? (role === 'admin' && pathname.includes('dashboard') ? 'Admin Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ')) : ''}
+                  {isClient ? (pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard') : ''}
                 </h1>
             </div>
         </header>
