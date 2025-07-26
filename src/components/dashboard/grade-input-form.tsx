@@ -52,6 +52,8 @@ export default function GradeInputForm() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             rollNumber: "",
+            studentId: "",
+            studentName: "",
             subjectId: "",
             grade: undefined,
             feedback: "",
@@ -113,7 +115,14 @@ export default function GradeInputForm() {
           description: `Grade for ${studentName} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
           className: "bg-accent text-accent-foreground"
         })
-        form.reset();
+        form.reset({
+            rollNumber: "",
+            studentId: "",
+            studentName: "",
+            subjectId: "",
+            grade: undefined,
+            feedback: "",
+        });
         setFoundStudentName(null);
         setIsNewStudent(false);
         router.refresh()
@@ -169,7 +178,7 @@ export default function GradeInputForm() {
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Subject</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a subject" />
@@ -192,7 +201,7 @@ export default function GradeInputForm() {
                         <FormItem>
                             <FormLabel>Grade (%)</FormLabel>
                             <FormControl>
-                                <Input type="number" placeholder="e.g., 85" {...field} />
+                                <Input type="number" placeholder="e.g., 85" {...field} value={field.value ?? ''}/>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
