@@ -64,8 +64,13 @@ export default function LoginPage() {
         className: 'bg-accent text-accent-foreground',
       });
       
-      const url = studentId ? `/dashboard?role=${role}&studentId=${studentId}` : `/dashboard?role=${role}`;
-      router.push(url);
+      const params = new URLSearchParams();
+      params.set('role', role);
+      if (studentId) {
+        params.set('studentId', studentId);
+      }
+      
+      router.push(`/dashboard?${params.toString()}`);
 
     } catch (error: any) {
         let description = "An unknown error occurred.";
