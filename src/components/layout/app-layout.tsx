@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, User, Settings, Users, BookOpen } from 'lucide-react';
+import { Home, LogOut, User, Settings, Users, BookOpen, ClipboardList } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById } from '@/lib/mock-data';
 
@@ -70,19 +70,33 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === '/dashboard' && searchParams.get('role') === 'teacher'}
-                  tooltip={{
-                    children: 'Teacher Dashboard',
-                  }}
-                >
-                  <Link href={'/dashboard?role=teacher'}>
-                    <Home />
-                    <span>{'Teacher Dashboard'}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard'}
+                tooltip={{
+                  children: 'Teacher Dashboard',
+                }}
+              >
+                <Link href={'/dashboard?role=teacher'}>
+                  <Home />
+                  <span>{'Teacher Dashboard'}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/grades'}
+                tooltip={{
+                  children: 'Student Grades',
+                }}
+              >
+                <Link href={'/grades'}>
+                  <ClipboardList />
+                  <span>{'Student Grades'}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -113,7 +127,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {userRole} Dashboard
+                  {pathname.startsWith('/grades') ? 'Student Grades' : `${userRole} Dashboard`}
                 </h1>
             </div>
         </header>
