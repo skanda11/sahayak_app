@@ -38,10 +38,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const [userRole, setUserRole] = useState('teacher');
 
   useEffect(() => {
-    const isStudentView = pathname.includes('/student-view');
+    const role = searchParams.get('role');
     const studentId = searchParams.get('studentId');
 
-    if (isStudentView && studentId) {
+    if (role === 'student' && studentId) {
       setUserRole('student');
       getStudentById(studentId).then((student) => {
         if (student) setUserName(student.name);
@@ -53,15 +53,18 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   }, [pathname, searchParams]);
 
   const navItems = [
-    { href: `/dashboard`, icon: Home, label: 'Teacher Dashboard' },
-    { href: `/student-view?studentId=student-1`, icon: User, label: 'Student 1 View' },
-    { href: `/student-view?studentId=student-2`, icon: User, label: 'Student 2 View' },
+    { href: `/dashboard?role=teacher`, icon: Home, label: 'Teacher Dashboard' },
+    { href: `/dashboard?role=student&studentId=student-1`, icon: User, label: 'Student 1 View' },
+    { href: `/dashboard?role=student&studentId=student-2`, icon: User, label: 'Student 2 View' },
   ];
 
   const userDetails = {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
   };
+  
+  const isStudentView = userRole === 'student';
+  const currentStudentId = searchParams.get('studentId');
 
   return (
     <SidebarProvider>
@@ -78,7 +81,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === item.href || (pathname.includes('/student-view') && item.href.includes(searchParams.get('studentId') ?? ''))}
+                  isActive={
+                    (pathname === '/dashboard' && searchParams.get('role') === 'teacher' && item.href.includes('role=teacher')) ||
+                    (isStudentView && item.href.includes(`studentId=${currentStudentId}`))
+                  }
                   tooltip={{
                     children: item.label,
                   }}
@@ -120,7 +126,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard'}
+                  {userRole} Dashboard
                 </h1>
             </div>
         </header>

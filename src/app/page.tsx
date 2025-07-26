@@ -11,7 +11,7 @@ export default function LandingPage() {
         <p className="text-xl text-muted-foreground mt-4">Your AI-powered academic companion.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full px-4">
-        <Link href="/dashboard" className="group">
+        <Link href="/dashboard?role=teacher" className="group">
           <Card className="hover:shadow-lg hover:border-primary transition-all duration-300">
             <CardHeader className="p-8">
               <div className="flex items-center justify-between">
@@ -27,7 +27,7 @@ export default function LandingPage() {
             </CardHeader>
           </Card>
         </Link>
-        <Link href="/student-view?studentId=student-1" className="group">
+        <Link href="/dashboard?role=student&studentId=student-1" className="group">
           <Card className="hover:shadow-lg hover:border-primary transition-all duration-300">
             <CardHeader className="p-8">
                <div className="flex items-center justify-between">
