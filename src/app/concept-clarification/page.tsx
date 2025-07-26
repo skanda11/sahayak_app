@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { clarifyConceptAndQuiz } from '@/ai/flows/concept-clarification';
-import type { QuizQuestion } from '@/lib/types';
+import type { QuizQuestion, Subject } from '@/lib/types';
 import { Loader2, Lightbulb, FileQuestion } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import QuizClient from '@/components/concept-clarification/quiz-client';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getAllSubjects } from '@/lib/mock-data';
 
 // Helper function to parse the quiz text into a structured format
 function parseQuiz(quizText: string): QuizQuestion[] {
@@ -37,20 +39,23 @@ function parseQuiz(quizText: string): QuizQuestion[] {
 
 export default function ConceptClarificationPage() {
   const [concept, setConcept] = useState('');
+  const [subject, setSubject] = useState('');
   const [result, setResult] = useState<{ explanation: string; quiz: QuizQuestion[] } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const subjects = getAllSubjects();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!concept.trim()) return;
+    if (!concept.trim() || !subject) return;
 
     setIsLoading(true);
     setError(null);
     setResult(null);
 
     try {
-      const response = await clarifyConceptAndQuiz({ concept });
+      const response = await clarifyConceptAndQuiz({ concept, subject });
       const parsedQuiz = parseQuiz(response.quiz);
       setResult({ explanation: response.explanation, quiz: parsedQuiz });
     } catch (err) {
@@ -66,10 +71,20 @@ export default function ConceptClarificationPage() {
         <Card className="mb-8">
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">Concept Clarifier</CardTitle>
-                <CardDescription>Enter a concept you want to understand better. Our AI will provide a clear explanation and a short quiz.</CardDescription>
+                <CardDescription>Enter a subject and concept you want to understand better. Our AI will provide a clear explanation and a short quiz.</CardDescription>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleSubmit} className="flex items-center gap-4">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4">
+                    <Select onValueChange={setSubject} value={subject} disabled={isLoading}>
+                      <SelectTrigger className="h-11 text-base sm:w-1/3">
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((s: Subject) => (
+                          <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Input
                         value={concept}
                         onChange={(e) => setConcept(e.target.value)}
@@ -77,7 +92,7 @@ export default function ConceptClarificationPage() {
                         disabled={isLoading}
                         className="h-11 text-base"
                     />
-                    <Button type="submit" disabled={isLoading || !concept.trim()} className="h-11">
+                    <Button type="submit" disabled={isLoading || !concept.trim() || !subject} className="h-11 w-full sm:w-auto">
                         {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
                         Clarify
                     </Button>

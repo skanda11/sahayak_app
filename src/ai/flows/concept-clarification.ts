@@ -15,6 +15,7 @@ import {z} from 'genkit';
 
 const ClarifyConceptAndQuizInputSchema = z.object({
   concept: z.string().describe('The concept to be clarified.'),
+  subject: z.string().describe('The subject the concept belongs to.'),
 });
 export type ClarifyConceptAndQuizInput = z.infer<typeof ClarifyConceptAndQuizInputSchema>;
 
@@ -34,15 +35,16 @@ const clarifyConceptAndQuizPrompt = ai.definePrompt({
   name: 'clarifyConceptAndQuizPrompt',
   input: {schema: ClarifyConceptAndQuizInputSchema},
   output: {schema: ClarifyConceptAndQuizOutputSchema},
-  prompt: `You are an expert tutor. Your task is to clarify a given concept and generate a quiz to test the student's understanding.
+  prompt: `You are an expert tutor. Your task is to clarify a given concept within a specific subject and generate a quiz to test the student's understanding.
 
+Subject: {{{subject}}}
 Concept: {{{concept}}}
 
-First, provide a detailed explanation of the concept. Then, create a quiz with multiple-choice questions to assess understanding.
+First, provide a detailed explanation of the concept, tailored to the given subject. Then, create a quiz with multiple-choice questions to assess understanding.
 
 Explanation:
 
-Quiz:`, // Fixed: Added Explanation and Quiz prompts
+Quiz:`,
 });
 
 const clarifyConceptAndQuizFlow = ai.defineFlow(
