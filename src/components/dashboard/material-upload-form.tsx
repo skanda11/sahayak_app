@@ -8,17 +8,20 @@ import { Input } from "../ui/input";
 import { UploadCloud, File, X } from "lucide-react";
 import { addMaterial } from "@/lib/mock-data";
 import { storage } from "@/lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
+import { Progress } from "../ui/progress";
 
 export default function MaterialUploadForm({ classId, subjectId }: { classId: string, subjectId: string }) {
     const [file, setFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const { toast } = useToast();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setFile(e.target.files[0]);
+            setUploadProgress(0);
         }
     };
 
@@ -34,36 +37,44 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
 
         setIsUploading(true);
         
-        try {
-            const fileId = uuidv4();
-            const storageRef = ref(storage, `materials/${classId}/${subjectId}/${fileId}-${file.name}`);
-            const uploadResult = await uploadBytes(storageRef, file);
-            const downloadURL = await getDownloadURL(uploadResult.ref);
+        const fileId = uuidv4();
+        const storageRef = ref(storage, `materials/${classId}/${subjectId}/${fileId}-${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
 
-            await addMaterial(classId, subjectId, {
-                id: fileId,
-                name: file.name,
-                url: downloadURL,
-                type: 'reference' // You can enhance this to detect file type
-            });
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+            },
+            (error) => {
+                console.error("Upload failed:", error);
+                toast({
+                    title: "Upload Failed",
+                    description: "Something went wrong during the file upload.",
+                    variant: "destructive"
+                });
+                setIsUploading(false);
+                setFile(null);
+            },
+            async () => {
+                const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                await addMaterial(classId, subjectId, {
+                    id: fileId,
+                    name: file.name,
+                    url: downloadURL,
+                    type: 'reference'
+                });
 
-            toast({
-                title: "Upload Successful!",
-                description: `${file.name} has been uploaded.`,
-                className: "bg-accent text-accent-foreground"
-            });
+                toast({
+                    title: "Upload Successful!",
+                    description: `${file.name} has been uploaded.`,
+                    className: "bg-accent text-accent-foreground"
+                });
 
-        } catch (error) {
-            console.error("Upload failed:", error);
-            toast({
-                title: "Upload Failed",
-                description: "Something went wrong during the file upload.",
-                variant: "destructive"
-            });
-        } finally {
-            setIsUploading(false);
-            setFile(null);
-        }
+                setIsUploading(false);
+                setFile(null);
+            }
+        );
     }
 
     return (
@@ -76,7 +87,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                         Choose a file to upload
                     </label>
                     <p className="text-xs text-muted-foreground">PDF, DOCX, etc. up to 10MB</p>
-                    <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} />
+                    <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} disabled={isUploading} />
                 </div>
             ) : (
                 <div className="w-full">
@@ -86,14 +97,20 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                              <span className="text-sm font-medium truncate">{file.name}</span>
                              <span className="text-xs text-muted-foreground whitespace-nowrap">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="h-6 w-6">
+                        <Button variant="ghost" size="icon" onClick={() => setFile(null)} className="h-6 w-6" disabled={isUploading}>
                             <X className="h-4 w-4" />
                         </Button>
                     </div>
+                    {isUploading && (
+                        <div className="space-y-1 text-left">
+                            <Progress value={uploadProgress} className="w-full" />
+                            <p className="text-xs text-muted-foreground">{Math.round(uploadProgress)}% uploaded</p>
+                        </div>
+                    )}
                 </div>
             )}
             <Button onClick={handleUpload} disabled={!file || isUploading} className="w-full mt-2">
-                {isUploading ? "Uploading..." : "Upload Material"}
+                {isUploading ? `Uploading...` : "Upload Material"}
             </Button>
         </div>
     )
