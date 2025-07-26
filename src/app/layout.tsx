@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'AcademiaTrack',
+  title: 'Sahayak',
   description: 'Track your academic progress with AI-powered insights.',
 };
 
