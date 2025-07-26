@@ -53,11 +53,21 @@ export default function GradeInputForm({ students }: GradeInputFormProps) {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        await addGrade(values.studentId, values.subjectId, values.grade, values.feedback)
+        const studentName = students.find(s => s.id === values.studentId)?.name;
+        if (!studentName) {
+            toast({
+                title: "Error",
+                description: "Could not find student name. Please try again.",
+                variant: "destructive"
+            })
+            return;
+        }
+
+        await addGrade(values.studentId, studentName, values.subjectId, values.grade, values.feedback)
         
         toast({
           title: "Grade Submitted!",
-          description: `Grade for ${students.find(s => s.id === values.studentId)?.name} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
+          description: `Grade for ${studentName} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
           className: "bg-accent text-accent-foreground"
         })
         form.reset()

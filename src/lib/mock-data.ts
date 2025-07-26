@@ -71,21 +71,22 @@ export function getAllSubjects(): Subject[] {
     return subjects;
 }
 
-export async function addGrade(studentId: string, subjectId: string, grade: number, feedback: string) {
+export async function addGrade(studentId: string, studentName: string, subjectId: string, grade: number, feedback: string) {
     const studentRef = doc(db, 'students', studentId);
     const studentSnap = await getDoc(studentRef);
 
-    if (studentSnap.exists()) {
-      const gradeData = {
-        subjectId,
-        grade,
-        feedback,
-        date: new Date().toISOString().split('T')[0],
-      };
-      const gradesCollectionRef = collection(db, 'students', studentId, 'grades');
-      // Add a new document with a generated id.
-      await setDoc(doc(gradesCollectionRef), gradeData);
-    } else {
-        console.error(`Student with id ${studentId} not found in Firestore.`);
+    if (!studentSnap.exists()) {
+      // Create student if they don't exist
+      await setDoc(studentRef, { name: studentName });
     }
+    
+    const gradeData = {
+      subjectId,
+      grade,
+      feedback,
+      date: new Date().toISOString().split('T')[0],
+    };
+    const gradesCollectionRef = collection(db, 'students', studentId, 'grades');
+    // Add a new document with a generated id.
+    await setDoc(doc(gradesCollectionRef), gradeData);
 }
