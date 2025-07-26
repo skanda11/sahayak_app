@@ -33,44 +33,30 @@ import { getStudentById } from '@/lib/mock-data';
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') ?? 'teacher';
-  const studentId = searchParams.get('studentId');
 
-  const [userName, setUserName] = useState('User');
+  const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
 
   useEffect(() => {
-    const currentRole = searchParams.get('role') ?? 'teacher';
-    const currentStudentId = searchParams.get('studentId');
-    setUserRole(currentRole);
+    const role = searchParams.get('role') || 'teacher';
+    const studentId = searchParams.get('studentId');
 
-    if (currentRole === 'student' && currentStudentId) {
-        getStudentById(currentStudentId).then(student => {
-            if(student) setUserName(student.name);
-        })
-    } else if (currentRole === 'teacher') {
-        setUserName('Teacher');
+    if (role === 'student' && studentId) {
+      setUserRole('student');
+      getStudentById(studentId).then((student) => {
+        if (student) setUserName(student.name);
+      });
+    } else {
+      setUserRole('teacher');
+      setUserName('Teacher');
     }
   }, [searchParams]);
-
 
   const navItems = [
     { href: `/`, icon: Home, label: 'Dashboard' },
     { href: `/student-view?studentId=student-1`, icon: User, label: 'Student 1 View' },
     { href: `/student-view?studentId=student-2`, icon: User, label: 'Student 2 View' },
   ];
-
-  const getHref = (href: string) => {
-    if (href.includes('?')) {
-        const [path, params] = href.split('?');
-        const urlParams = new URLSearchParams(params);
-        urlParams.set('role', path === '/' ? 'teacher' : 'student');
-        return `${path}?${urlParams.toString()}`;
-    }
-    const params = new URLSearchParams();
-    params.set('role', 'teacher');
-    return `${href}?${params.toString()}`;
-  }
 
   const userDetails = {
     name: userName,
@@ -97,7 +83,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                     children: item.label,
                   }}
                 >
-                  <Link href={item.label.startsWith('Student') ? `/student-view?studentId=${item.href.split('studentId=')[1]}&role=student` : `/?role=teacher`}>
+                  <Link href={item.label.startsWith('Student') ? `/student-view?studentId=${item.href.split('studentId=')[1]}` : `/`}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>

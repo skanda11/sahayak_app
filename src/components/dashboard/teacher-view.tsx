@@ -1,5 +1,8 @@
 
-import { getAllStudents, getSubjectById, getAllSubjects, seedDatabase } from "@/lib/mock-data";
+'use client';
+
+import { useEffect, useState } from 'react';
+import { getAllStudents, getSubjectById, getAllSubjects } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,16 +10,87 @@ import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
 import type { Student, Subject } from "@/lib/types";
 import { Button } from "../ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { Users, BookOpen, Database, User } from "lucide-react";
 import Link from "next/link";
 import { SeedButton } from "./seed-button";
+import { Skeleton } from '../ui/skeleton';
 
 
-// This is now an async Server Component
-export default async function TeacherView() {
-    const students = await getAllStudents();
-    const subjects = getAllSubjects();
+function TeacherViewSkeleton() {
+    return (
+        <div className="flex flex-col gap-6">
+            <Skeleton className="h-8 w-1/3" />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card><CardHeader><Skeleton className="h-5 w-2/3" /></CardHeader><CardContent><Skeleton className="h-6 w-1/3" /><Skeleton className="h-4 w-2/3 mt-1" /></CardContent></Card>
+                <Card><CardHeader><Skeleton className="h-5 w-2/3" /></CardHeader><CardContent><Skeleton className="h-6 w-1/3" /><Skeleton className="h-4 w-2/3 mt-1" /></CardContent></Card>
+                <Card><CardHeader><Skeleton className="h-5 w-2/3" /></CardHeader><CardContent><Skeleton className="h-9 w-full" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent></Card>
+                <Card><CardHeader><Skeleton className="h-5 w-2/3" /></CardHeader><CardContent><div className="flex flex-col gap-2"><Skeleton className="h-9 w-full" /><Skeleton className="h-9 w-full" /></div></CardContent></Card>
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="lg:col-span-2">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Student Overview</CardTitle>
+                            <CardDescription>View all students and their average performance.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                           <div className="space-y-4">
+                                <div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="flex-1"><Skeleton className="h-5 w-1/3" /></div><Skeleton className="h-5 w-1/4" /></div>
+                                <div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="flex-1"><Skeleton className="h-5 w-1/3" /></div><Skeleton className="h-5 w-1/4" /></div>
+                                <div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-full" /><div className="flex-1"><Skeleton className="h-5 w-1/3" /></div><Skeleton className="h-5 w-1/4" /></div>
+                           </div>
+                        </CardContent>
+                    </Card>
+                </div>
+                <div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Input Grades</CardTitle>
+                            <CardDescription>Add a new grade and feedback for a student.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                                <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                                <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-10 w-full" /></div>
+                                <div className="space-y-2"><Skeleton className="h-4 w-1/4" /><Skeleton className="h-20 w-full" /></div>
+                                <Skeleton className="h-10 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default function TeacherView() {
+    const [students, setStudents] = useState<Student[]>([]);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                setIsLoading(true);
+                const [studentsData, subjectsData] = await Promise.all([
+                    getAllStudents(),
+                    getAllSubjects()
+                ]);
+                setStudents(studentsData);
+                setSubjects(subjectsData);
+            } catch (error) {
+                console.error("Failed to fetch teacher dashboard data:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
+
+    if (isLoading) {
+        return <TeacherViewSkeleton />;
+    }
 
     return (
         <div className="flex flex-col gap-6">
