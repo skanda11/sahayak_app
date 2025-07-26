@@ -27,9 +27,6 @@ export default async function DashboardPage({
     );
   }
 
-  return (
-    <div className="flex h-full items-center justify-center">
-      <p className="text-muted-foreground">Please select a role from the landing page.</p>
-    </div>
-  );
+  // Fallback to teacher view if no role is specified or role is invalid
+  return <TeacherView />;
 }
