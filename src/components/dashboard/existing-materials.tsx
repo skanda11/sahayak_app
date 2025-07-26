@@ -12,14 +12,14 @@ export default function ExistingMaterials({ classId, subjectId }: { classId: str
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (subjectId) {
+        if (classId && subjectId) {
             setIsLoading(true);
-            getMaterialsForSubject(subjectId).then(data => {
+            getMaterialsForSubject(classId, subjectId).then(data => {
                 setMaterials(data);
                 setIsLoading(false);
             });
         }
-    }, [subjectId]);
+    }, [classId, subjectId]);
 
     return (
         <div className="rounded-lg border p-4">

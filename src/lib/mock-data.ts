@@ -48,24 +48,28 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
 ];
 
 const mockMaterials: { [key: string]: Material[] } = {
-  'Mathematics': [
-    { id: 'mat-1', name: 'Algebra-I-Textbook.pdf', type: 'textbook', url: '#' },
-    { id: 'mat-2', name: 'Geometry-Cheatsheet.pdf', type: 'notes', url: '#' },
+  'Grade 5-Mathematics': [
+    { id: 'g5-mat-1', name: 'Grade5-Algebra-Basics.pdf', type: 'textbook', url: '#' },
+    { id: 'g5-mat-2', name: 'Grade5-Geometry-Shapes.pdf', type: 'notes', url: '#' },
   ],
-  'Science': [
-    { id: 'sci-1', name: 'Intro-to-Physics.pdf', type: 'textbook', url: '#' },
+  'Grade 5-Science': [
+    { id: 'g5-sci-1', name: 'Grade5-Intro-to-Ecosystems.pdf', type: 'textbook', url: '#' },
   ],
-  'English': [
-    { id: 'eng-1', name: 'Shakespeare-Complete-Works.pdf', type: 'reference', url: '#' },
-    { id: 'eng-2', name: 'Grammar-Guide.pdf', type: 'notes', url: '#' },
+  'Grade 6-Mathematics': [
+    { id: 'g6-mat-1', name: 'Grade6-Advanced-Algebra.pdf', type: 'textbook', url: '#' },
+  ],
+  'Grade 7-English': [
+    { id: 'g7-eng-1', name: 'Grade7-Shakespeare-The-Tempest.pdf', type: 'reference', url: '#' },
+    { id: 'g7-eng-2', name: 'Grade7-Grammar-Punctuation.pdf', type: 'notes', url: '#' },
   ]
 };
 
-export async function getMaterialsForSubject(subjectId: string): Promise<Material[]> {
-  // This is a mock function. In a real app, you would fetch this from Firestore.
+export async function getMaterialsForSubject(classId: string, subjectId: string): Promise<Material[]> {
+  // This is a mock function. In a real app, you would fetch this from Firestore based on class and subject.
+  const key = `${classId}-${subjectId}`;
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(mockMaterials[subjectId] || []);
+      resolve(mockMaterials[key] || []);
     }, 500);
   });
 }

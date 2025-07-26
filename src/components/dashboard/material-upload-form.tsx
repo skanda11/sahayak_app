@@ -34,7 +34,7 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         // Mock database update
-        console.log(`Uploading ${file.name} for class ${classId} and subject ${subjectId}`);
+        console.log(`Uploading ${file.name} for class "${classId}" and subject "${subjectId}"`);
         
         setIsUploading(false);
         setFile(null); // Reset file input
