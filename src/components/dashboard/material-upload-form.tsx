@@ -6,9 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { UploadCloud, File, X } from "lucide-react";
-import { createMaterialRef, updateMaterial } from "@/lib/mock-data";
-import { storage } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { addDoc, collection, updateDoc, doc } from "firebase/firestore";
 import { Progress } from "../ui/progress";
 
 export default function MaterialUploadForm({ classId, subjectId }: { classId: string, subjectId: string }) {
@@ -38,9 +38,14 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         setUploadProgress(0);
         
         try {
-            // 1. Create a document reference in Firestore first to get a unique ID
-            const materialRef = await createMaterialRef(classId, subjectId);
-            const materialId = materialRef.id;
+            // 1. Create a document in Firestore first to get a unique ID
+            const materialCollectionRef = collection(db, 'materials', classId, subjectId);
+            const materialDocRef = await addDoc(materialCollectionRef, {
+                name: file.name,
+                type: 'reference',
+                url: '', // temporary empty URL
+            });
+            const materialId = materialDocRef.id;
 
             // 2. Use that unique ID to create the path in Firebase Storage
             const storageRef = ref(storage, `materials/${classId}/${subjectId}/${materialId}-${file.name}`);
@@ -65,10 +70,8 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                 async () => {
                     // 3. Get the download URL and update the Firestore document
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    await updateMaterial(materialRef, {
-                        name: file.name,
+                    await updateDoc(doc(db, 'materials', classId, subjectId, materialId), {
                         url: downloadURL,
-                        type: 'reference'
                     });
 
                     toast({
