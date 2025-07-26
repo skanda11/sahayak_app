@@ -83,7 +83,7 @@ export default function DashboardPage({
 }: {
   searchParams?: { role?: string };
 }) {
-  const role = searchParams?.role || 'student';
+  const role = searchParams?.role;
 
   return (
     <Suspense fallback={<DashboardSkeleton />}>

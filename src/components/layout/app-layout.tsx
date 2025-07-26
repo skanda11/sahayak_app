@@ -31,7 +31,7 @@ import { Logo } from '../icons';
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') || 'student';
+  const role = searchParams.get('role') ?? 'student';
 
   const navItems = [
     { href: `/dashboard`, icon: Home, label: 'Dashboard' },
