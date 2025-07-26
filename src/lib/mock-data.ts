@@ -47,32 +47,24 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
     },
 ];
 
-const mockMaterials: { [key: string]: Material[] } = {
-  'Grade 5-Mathematics': [
-    { id: 'g5-mat-1', name: 'Grade5-Algebra-Basics.pdf', type: 'textbook', url: '#' },
-    { id: 'g5-mat-2', name: 'Grade5-Geometry-Shapes.pdf', type: 'notes', url: '#' },
-  ],
-  'Grade 5-Science': [
-    { id: 'g5-sci-1', name: 'Grade5-Intro-to-Ecosystems.pdf', type: 'textbook', url: '#' },
-  ],
-  'Grade 6-Mathematics': [
-    { id: 'g6-mat-1', name: 'Grade6-Advanced-Algebra.pdf', type: 'textbook', url: '#' },
-  ],
-  'Grade 7-English': [
-    { id: 'g7-eng-1', name: 'Grade7-Shakespeare-The-Tempest.pdf', type: 'reference', url: '#' },
-    { id: 'g7-eng-2', name: 'Grade7-Grammar-Punctuation.pdf', type: 'notes', url: '#' },
-  ]
-};
-
-export async function getMaterialsForSubject(classId: string, subjectId: string): Promise<Material[]> {
-  // This is a mock function. In a real app, you would fetch this from Firestore based on class and subject.
-  const key = `${classId}-${subjectId}`;
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(mockMaterials[key] || []);
-    }, 500);
+export async function addMaterial(classId: string, subjectId: string, material: Omit<Material, 'id'> & {id: string}) {
+  const materialRef = doc(db, 'materials', classId, subjectId, material.id);
+  await setDoc(materialRef, {
+    name: material.name,
+    url: material.url,
+    type: material.type,
   });
 }
+
+export async function getMaterialsForSubject(classId: string, subjectId: string): Promise<Material[]> {
+  const materialsRef = collection(db, 'materials', classId, subjectId);
+  const snapshot = await getDocs(materialsRef);
+  if (snapshot.empty) {
+    return [];
+  }
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Material));
+}
+
 
 const teacherEmails = ['teacher1@example.com'];
 

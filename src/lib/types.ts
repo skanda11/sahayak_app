@@ -25,7 +25,6 @@ export interface Subject {
   id: string;
   name: string;
   icon: React.ComponentType<{ className?: string }>;
-  materials?: Material[];
 }
 
 export interface QuizQuestion {

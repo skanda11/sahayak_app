@@ -6,6 +6,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { UploadCloud, File, X } from "lucide-react";
+import { addMaterial } from "@/lib/mock-data";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 
 export default function MaterialUploadForm({ classId, subjectId }: { classId: string, subjectId: string }) {
     const [file, setFile] = useState<File | null>(null);
@@ -29,21 +33,37 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
         }
 
         setIsUploading(true);
-        // In a real application, you would upload the file to a service like Firebase Storage.
-        // For this mock, we will just simulate a delay.
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Mock database update
-        console.log(`Uploading ${file.name} for class "${classId}" and subject "${subjectId}"`);
         
-        setIsUploading(false);
-        setFile(null); // Reset file input
+        try {
+            const fileId = uuidv4();
+            const storageRef = ref(storage, `materials/${classId}/${subjectId}/${fileId}-${file.name}`);
+            const uploadResult = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(uploadResult.ref);
 
-        toast({
-            title: "Upload Successful!",
-            description: `${file.name} has been uploaded.`,
-            className: "bg-accent text-accent-foreground"
-        });
+            await addMaterial(classId, subjectId, {
+                id: fileId,
+                name: file.name,
+                url: downloadURL,
+                type: 'reference' // You can enhance this to detect file type
+            });
+
+            toast({
+                title: "Upload Successful!",
+                description: `${file.name} has been uploaded.`,
+                className: "bg-accent text-accent-foreground"
+            });
+
+        } catch (error) {
+            console.error("Upload failed:", error);
+            toast({
+                title: "Upload Failed",
+                description: "Something went wrong during the file upload.",
+                variant: "destructive"
+            });
+        } finally {
+            setIsUploading(false);
+            setFile(null);
+        }
     }
 
     return (

@@ -6,6 +6,8 @@ import type { Material } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
 import { Badge } from "../ui/badge";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 export default function ExistingMaterials({ classId, subjectId }: { classId: string, subjectId: string }) {
     const [materials, setMaterials] = useState<Material[]>([]);
@@ -14,10 +16,23 @@ export default function ExistingMaterials({ classId, subjectId }: { classId: str
     useEffect(() => {
         if (classId && subjectId) {
             setIsLoading(true);
-            getMaterialsForSubject(classId, subjectId).then(data => {
+            const materialsRef = collection(db, 'materials', classId, subjectId);
+            const q = query(materialsRef);
+
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const data: Material[] = [];
+                querySnapshot.forEach((doc) => {
+                    data.push({ id: doc.id, ...doc.data() } as Material);
+                });
                 setMaterials(data);
                 setIsLoading(false);
+            }, (error) => {
+                console.error("Failed to fetch materials:", error);
+                setIsLoading(false);
             });
+            
+            // Cleanup subscription on unmount
+            return () => unsubscribe();
         }
     }, [classId, subjectId]);
 

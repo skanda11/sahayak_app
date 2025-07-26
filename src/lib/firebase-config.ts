@@ -12,7 +12,7 @@ export const firebaseConfig = {
   apiKey: "AIzaSyB7hNRT2GVb7yxluhNuT3xkcvmN4KPy06k",
   authDomain: "sahayak-2311.firebaseapp.com",
   projectId: "sahayak-2311",
-  storageBucket: "sahayak-2311.firebasestorage.app",
+  storageBucket: "sahayak-2311.appspot.com",
   messagingSenderId: "1047129166081",
   appId: "1:1047129166081:web:3a439fd8d82ba0c529cb00",
   measurementId: "G-85L0GY4H98"
