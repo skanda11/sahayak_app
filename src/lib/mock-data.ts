@@ -45,7 +45,7 @@ export const students: Student[] = [
   },
 ];
 
-const teacherEmails = ['teacher@example.com'];
+const teacherEmails = ['1teacher@example.com'];
 
 export function isTeacherEmail(email: string): boolean {
   return teacherEmails.includes(email.toLowerCase());

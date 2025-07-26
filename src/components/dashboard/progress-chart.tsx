@@ -1,6 +1,7 @@
+
 "use client";
 
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { Grade, Subject } from '@/lib/types';
 import { useMemo } from 'react';
 import { getAllSubjects } from '@/lib/mock-data';
@@ -29,7 +30,7 @@ export function ProgressChart({ grades }: ProgressChartProps) {
   return (
     <div className="h-[350px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-            <LineChart
+            <BarChart
             data={data}
             margin={{
                 top: 5,
@@ -50,18 +51,15 @@ export function ProgressChart({ grades }: ProgressChartProps) {
             />
             <Legend wrapperStyle={{fontSize: "14px"}} />
             {subjects.map((subject, index) => (
-                <Line
+                <Bar
                 key={subject.id}
-                type="monotone"
                 dataKey={subject.id}
                 name={subject.name}
-                stroke={subjectColors[index % subjectColors.length]}
-                strokeWidth={2}
-                dot={{ r: 4 }}
-                activeDot={{ r: 6 }}
+                fill={subjectColors[index % subjectColors.length]}
+                radius={[4, 4, 0, 0]}
                 />
             ))}
-            </LineChart>
+            </BarChart>
       </ResponsiveContainer>
     </div>
   );
