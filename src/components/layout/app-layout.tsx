@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, LayoutGrid, BarChart3, ListChecks, GraduationCap } from 'lucide-react';
+import { User, Settings, LayoutGrid, BarChart3, ListChecks, PenSquare } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById } from '@/lib/mock-data';
 
@@ -80,6 +80,11 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild isActive={pathname === '/dashboard/class'}>
                         <Link href="/dashboard/class"><LayoutGrid /><span>Class</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/content-review'}>
+                        <Link href="/dashboard/content-review"><PenSquare /><span>Content Review</span></Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>

@@ -1,7 +1,7 @@
 import { Book, Calculator, Dna, FlaskConical, Globe } from 'lucide-react';
-import type { Student, Subject, Grade, Assignment, Material } from './types';
+import type { Student, Subject, Grade, Assignment, Material, Content } from './types';
 import { db } from './firebase';
-import { doc, getDoc, getDocs, collection, setDoc, writeBatch, query, where, limit, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection, setDoc, writeBatch, query, where, limit, updateDoc, addDoc } from 'firebase/firestore';
 import { generateAssignment } from '@/ai/flows/assignment-generation';
 
 export const subjects: Subject[] = [
@@ -204,6 +204,25 @@ export async function completeAssignment(studentId: string, assignmentId: string
         completedDate: new Date().toISOString().split('T')[0],
     });
 }
+
+export async function addContent(content: Omit<Content, 'id'>) {
+    await addDoc(collection(db, 'content'), content);
+}
+
+export async function getAllContent(): Promise<Content[]> {
+    const contentCollectionRef = collection(db, 'content');
+    const contentSnapshot = await getDocs(contentCollectionRef);
+    if (contentSnapshot.empty) {
+        return [];
+    }
+    return contentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Content)).sort((a,b) => a.subjectName.localeCompare(b.subjectName));
+}
+
+export async function updateContentStatus(contentId: string, status: 'reviewed' | 'under-review') {
+    const contentRef = doc(db, 'content', contentId);
+    await updateDoc(contentRef, { status });
+}
+
 
 export async function seedDatabase() {
     const studentsCollectionRef = collection(db, 'students');

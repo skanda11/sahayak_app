@@ -49,9 +49,10 @@ export interface Assignment {
 
 export interface Content {
   id: string;
+  classId: string;
   subjectId: string;
+  subjectName: string;
   grade: string;
-  sessionNumber: number;
   sessionTitle: string;
   sessionContent: string;
   status: 'under-review' | 'reviewed';
