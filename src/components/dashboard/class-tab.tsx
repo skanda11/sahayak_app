@@ -6,6 +6,7 @@ import GradeInputForm from "./grade-input-form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { useState } from "react";
 import { Button } from "../ui/button";
+import MaterialUploadForm from "./material-upload-form";
 
 export default function ClassTab() {
   const [selectedClass, setSelectedClass] = useState('');
@@ -20,7 +21,7 @@ export default function ClassTab() {
       <CardHeader>
         <CardTitle>Class Management</CardTitle>
         <CardDescription>
-          Select a class and subject to manage grades and feedback.
+          Select a class and subject to manage grades, feedback, and reference materials.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -56,9 +57,17 @@ export default function ClassTab() {
         </div>
 
         {selectedClass && selectedSubject && (
-            <div className="border-t pt-6">
-                <h3 className="text-lg font-medium mb-4">Enter Grades for {selectedClass} - {selectedSubject}</h3>
-                <GradeInputForm />
+            <div className="space-y-6 pt-6 border-t">
+                <div>
+                    <h3 className="text-lg font-medium">Reference Materials for {selectedClass} - {selectedSubject}</h3>
+                    <p className="text-sm text-muted-foreground">Upload textbooks, notes, or other reference materials for this subject.</p>
+                    <MaterialUploadForm classId={selectedClass} subjectId={selectedSubject} />
+                </div>
+                <div className="border-t pt-6">
+                    <h3 className="text-lg font-medium">Enter Grades for {selectedClass} - {selectedSubject}</h3>
+                    <GradeInputForm />
+                </div>
+
             </div>
         )}
 

@@ -13,10 +13,19 @@ export interface Student {
   assignments?: Assignment[];
 }
 
+export interface Material {
+  id: string;
+  name: string;
+  url: string; // URL to the stored file
+  type: 'textbook' | 'reference' | 'notes';
+}
+
+
 export interface Subject {
   id: string;
   name: string;
   icon: React.ComponentType<{ className?: string }>;
+  materials?: Material[];
 }
 
 export interface QuizQuestion {
