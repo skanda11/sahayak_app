@@ -5,8 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
 
-export default function TeacherView() {
-    const students = getAllStudents();
+export default async function TeacherView() {
+    const students = await getAllStudents();
 
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -30,7 +30,7 @@ export default function TeacherView() {
                                     const averageGrade = student.grades.length > 0 
                                         ? student.grades.reduce((acc, g) => acc + g.grade, 0) / student.grades.length
                                         : 0;
-                                    const latestGrade = student.grades[student.grades.length - 1];
+                                    const latestGrade = student.grades.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                                     const latestSubject = latestGrade ? getSubjectById(latestGrade.subjectId) : null;
 
                                     return (

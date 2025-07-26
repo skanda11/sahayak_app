@@ -8,8 +8,8 @@ import { User, Shield, Users, BookOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAllStudents, getAllSubjects } from '@/lib/mock-data';
 
-function AdminDashboard() {
-    const students = getAllStudents();
+async function AdminDashboard() {
+    const students = await getAllStudents();
     const subjects = getAllSubjects();
 
     return (

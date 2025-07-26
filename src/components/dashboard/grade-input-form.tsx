@@ -52,9 +52,8 @@ export default function GradeInputForm({ students }: GradeInputFormProps) {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // In a real app, this would be a server action
-        addGrade(values.studentId, values.subjectId, values.grade, values.feedback)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        await addGrade(values.studentId, values.subjectId, values.grade, values.feedback)
         
         toast({
           title: "Grade Submitted!",

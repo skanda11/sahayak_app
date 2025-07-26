@@ -1,7 +1,7 @@
 import { Book, Calculator, Dna, FlaskConical, Globe } from 'lucide-react';
 import type { Student, Subject, Grade } from './types';
 import { db } from './firebase';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc } from 'firebase/firestore';
 
 export const subjects: Subject[] = [
   { id: 'math', name: 'Mathematics', icon: Calculator },
@@ -11,7 +11,7 @@ export const subjects: Subject[] = [
   { id: 'biology', name: 'Biology', icon: Dna },
 ];
 
-export const students: Student[] = [
+export const mockStudents: Student[] = [
   {
     id: 'student-1',
     name: 'Alex Johnson',
@@ -59,7 +59,7 @@ export async function getStudentById(id: string): Promise<Student | undefined> {
 
   if (!studentDoc.exists()) {
     // Fallback to mock data if student not in Firestore
-    return students.find((s) => s.id === id);
+    return mockStudents.find((s) => s.id === id);
   }
 
   const studentData = studentDoc.data();
@@ -78,22 +78,61 @@ export function getSubjectById(id: string): Subject | undefined {
     return subjects.find((s) => s.id === id);
 }
 
-export function getAllStudents(): Student[] {
-    return students;
+export async function getAllStudents(): Promise<Student[]> {
+  const studentsCollectionRef = collection(db, 'students');
+  const studentsSnapshot = await getDocs(studentsCollectionRef);
+
+  if (studentsSnapshot.empty) {
+    // Fallback to mock data if Firestore collection is empty
+    return mockStudents;
+  }
+
+  const allStudents = await Promise.all(
+    studentsSnapshot.docs.map(async (studentDoc) => {
+      const studentData = studentDoc.data();
+      const gradesCollectionRef = collection(db, 'students', studentDoc.id, 'grades');
+      const gradesSnapshot = await getDocs(gradesCollectionRef);
+      const grades = gradesSnapshot.docs.map((doc) => doc.data() as Grade);
+
+      return {
+        id: studentDoc.id,
+        name: studentData.name,
+        grades: grades,
+      };
+    })
+  );
+
+  return allStudents;
 }
 
 export function getAllSubjects(): Subject[] {
     return subjects;
 }
 
-export function addGrade(studentId: string, subjectId: string, grade: number, feedback: string) {
-    const student = students.find((s) => s.id === studentId);
-    if (student) {
-        student.grades.push({
-            subjectId,
-            grade,
-            feedback,
-            date: new Date().toISOString().split('T')[0],
-        });
+export async function addGrade(studentId: string, subjectId: string, grade: number, feedback: string) {
+    const studentRef = doc(db, 'students', studentId);
+    const studentSnap = await getDoc(studentRef);
+
+    if (studentSnap.exists()) {
+      const gradeData = {
+        subjectId,
+        grade,
+        feedback,
+        date: new Date().toISOString().split('T')[0],
+      };
+      const gradesCollectionRef = collection(db, 'students', studentId, 'grades');
+      // Add a new document with a generated id.
+      await setDoc(doc(gradesCollectionRef), gradeData);
+    } else {
+      // Fallback to mock data if student not in firestore
+      const student = mockStudents.find((s) => s.id === studentId);
+      if (student) {
+          student.grades.push({
+              subjectId,
+              grade,
+              feedback,
+              date: new Date().toISOString().split('T')[0],
+          });
+      }
     }
 }
