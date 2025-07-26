@@ -45,21 +45,19 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
       setUserRole('student');
       getStudentById(studentId).then((student) => {
         if (student) setUserName(student.name);
+        else setUserName('Student');
       });
     } else {
       setUserRole('teacher');
       setUserName('Teacher');
     }
-  }, [pathname, searchParams]);
+  }, [searchParams]);
 
   const userDetails = {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
   };
   
-  const isStudentView = userRole === 'student';
-  const currentStudentId = searchParams.get('studentId');
-
   return (
     <SidebarProvider>
       <Sidebar>
