@@ -68,7 +68,14 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
   };
-  const currentPath = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+
+  if (!isClient) {
+      return (
+          <div className="flex min-h-screen items-center justify-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          </div>
+      );
+  }
 
   return (
     <SidebarProvider>
