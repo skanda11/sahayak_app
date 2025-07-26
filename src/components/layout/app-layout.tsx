@@ -52,10 +52,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, searchParams]);
 
-  const navItems = [
-    { href: `/dashboard?role=teacher`, icon: Home, label: 'Teacher Dashboard' },
-  ];
-
   const userDetails = {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
@@ -75,25 +71,20 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.label}>
+            <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
-                  isActive={
-                    (pathname === '/dashboard' && searchParams.get('role') === 'teacher' && item.href.includes('role=teacher')) ||
-                    (isStudentView && item.href.includes(`studentId=${currentStudentId}`))
-                  }
+                  isActive={pathname === '/dashboard' && searchParams.get('role') === 'teacher'}
                   tooltip={{
-                    children: item.label,
+                    children: 'Teacher Dashboard',
                   }}
                 >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
+                  <Link href={'/dashboard?role=teacher'}>
+                    <Home />
+                    <span>{'Teacher Dashboard'}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            ))}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
