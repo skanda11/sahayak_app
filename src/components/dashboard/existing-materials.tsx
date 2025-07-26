@@ -1,7 +1,6 @@
 
 'use client';
 
-import { getMaterialsForSubject } from "@/lib/mock-data";
 import type { Material } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
