@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import StudentView from '@/components/dashboard/student-view';
 import TeacherView from '@/components/dashboard/teacher-view';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -20,10 +20,10 @@ function AdminDashboard() {
     const { toast } = useToast();
     const router = useRouter();
 
-    useState(() => {
+    useEffect(() => {
         getAllStudents().then(setStudents);
         setSubjects(getAllSubjects());
-    });
+    }, []);
     
     const handleSeed = async () => {
         const result = await seedDatabase();

@@ -1,17 +1,16 @@
-import { getStudentById, getSubjectById, getAllSubjects } from '@/lib/mock-data';
+'use client';
+
+import { getStudentById, getSubjectById } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
 import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import type { Student } from '@/lib/types';
+import { Skeleton } from '../ui/skeleton';
 
-export default async function StudentView({ studentId }: { studentId: string }) {
-  const student = await getStudentById(studentId);
-
-  if (!student) {
-    return <div>Student not found.</div>;
-  }
-
+function StudentViewContent({ student }: { student: Student }) {
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
   const latestGrades = student.grades.slice(-2);
@@ -79,4 +78,39 @@ export default async function StudentView({ studentId }: { studentId: string }) 
         </div>
     </div>
   );
+}
+
+function StudentViewSkeleton() {
+    return (
+        <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-32 w-full" />
+            </div>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                <Skeleton className="lg:col-span-3 h-80 w-full" />
+                <Skeleton className="lg:col-span-2 h-80 w-full" />
+            </div>
+        </div>
+    )
+}
+
+export default function StudentView({ studentId }: { studentId: string }) {
+    const [student, setStudent] = useState<Student | null | undefined>(null);
+
+    useEffect(() => {
+        getStudentById(studentId).then(setStudent);
+    }, [studentId]);
+
+    if (student === null) {
+        return <StudentViewSkeleton />;
+    }
+
+    if (student === undefined) {
+        return <div>Student not found.</div>;
+    }
+
+    return <StudentViewContent student={student} />;
 }

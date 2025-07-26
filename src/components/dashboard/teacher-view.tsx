@@ -1,13 +1,16 @@
+'use client';
+
 import { getAllStudents, getSubjectById } from "@/lib/mock-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
+import { useEffect, useState } from "react";
+import type { Student } from "@/lib/types";
+import { Skeleton } from "../ui/skeleton";
 
-export default async function TeacherView() {
-    const students = await getAllStudents();
-
+function TeacherViewContent({ students }: { students: Student[] }) {
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
@@ -77,4 +80,31 @@ export default async function TeacherView() {
             </div>
         </div>
     );
+}
+
+function TeacherViewSkeleton() {
+    return (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+                <Skeleton className="h-[400px] w-full" />
+            </div>
+            <div>
+                <Skeleton className="h-[400px] w-full" />
+            </div>
+        </div>
+    )
+}
+
+export default function TeacherView() {
+    const [students, setStudents] = useState<Student[] | null>(null);
+
+    useEffect(() => {
+        getAllStudents().then(setStudents);
+    }, []);
+
+    if (students === null) {
+        return <TeacherViewSkeleton />;
+    }
+
+    return <TeacherViewContent students={students} />;
 }
