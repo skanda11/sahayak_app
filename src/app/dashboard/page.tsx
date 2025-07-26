@@ -74,14 +74,14 @@ function DashboardContent({ role }: { role?: string }) {
     if (role === 'admin') {
         return <AdminDashboard />
     }
-    // Default to student view
+    // Default to student view if role is not specified
     return <StudentView studentId="student-1" />;
 }
 
 export default function DashboardPage({
   searchParams,
 }: {
-  searchParams?: { role?: string };
+  searchParams: { role?: string };
 }) {
   const role = searchParams?.role;
 

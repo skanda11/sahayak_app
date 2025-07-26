@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import {
@@ -32,6 +32,12 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const role = searchParams.get('role') ?? 'student';
+
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const navItems = [
     { href: `/dashboard`, icon: Home, label: 'Dashboard' },
@@ -118,7 +124,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {role === 'admin' && pathname.includes('dashboard') ? 'Admin Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ')}
+                  {isClient ? (role === 'admin' && pathname.includes('dashboard') ? 'Admin Dashboard' : pathname.split('/').pop()?.replace(/-/g, ' ')) : ''}
                 </h1>
             </div>
         </header>
@@ -133,7 +139,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <AppLayoutClient>{children}</AppLayoutClient>
     </Suspense>
   )
