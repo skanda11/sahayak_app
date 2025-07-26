@@ -83,20 +83,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === '/grades'}
-                tooltip={{
-                  children: 'Student Grades',
-                }}
-              >
-                <Link href={'/grades'}>
-                  <ClipboardList />
-                  <span>{'Student Grades'}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
