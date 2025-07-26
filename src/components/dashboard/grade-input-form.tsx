@@ -214,7 +214,7 @@ export default function GradeInputForm() {
                         <FormItem>
                             <FormLabel>Feedback</FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Provide constructive feedback..." {...field} />
+                                <Textarea placeholder="Please mention the areas of improvement for the student. This prompt will be used to generate specialised content for the student." {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
