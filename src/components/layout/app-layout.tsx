@@ -89,17 +89,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 <Link href={'/dashboard/activity'}><ListChecks /><span>Activity</span></Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-            <SidebarSeparator />
-
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard') && (searchParams.get('role') === 'student' || !searchParams.get('role'))} tooltip={{children: 'Student Dashboard'}}>
-                    <Link href={`/dashboard?role=student&studentId=student-1`}>
-                        <User />
-                        <span>Student View</span>
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
