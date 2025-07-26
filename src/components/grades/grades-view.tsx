@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import type { Student, Subject } from '@/lib/types';
 import { Badge } from '../ui/badge';
+import { getSubjectById } from '@/lib/mock-data';
 
 function getGradeColor(grade: number) {
     if (grade >= 90) return 'bg-green-500 hover:bg-green-500';
@@ -27,9 +28,17 @@ export default function GradesView({ students, subjects }: { students: Student[]
                         <TableHeader>
                             <TableRow>
                                 <TableHead>Student</TableHead>
-                                {subjects.map(subject => (
-                                    <TableHead key={subject.id} className="text-center">{subject.name}</TableHead>
-                                ))}
+                                {subjects.map(subject => {
+                                    const SubjectIcon = getSubjectById(subject.id)?.icon;
+                                    return (
+                                        <TableHead key={subject.id} className="text-center">
+                                            <div className='flex items-center justify-center gap-2'>
+                                                {SubjectIcon && <SubjectIcon className="h-4 w-4 text-muted-foreground" />}
+                                                {subject.name}
+                                            </div>
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
