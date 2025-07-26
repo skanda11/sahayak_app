@@ -84,9 +84,15 @@ function AdminDashboard() {
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4 md:flex-row">
                         <Button asChild size="lg" className="w-full md:w-auto">
-                            <Link href="/dashboard?role=student">
+                            <Link href="/dashboard?role=student&studentId=student-1">
                                 <User className="mr-2" />
-                                View as Student
+                                View as Student 1
+                            </Link>
+                        </Button>
+                         <Button asChild size="lg" className="w-full md:w-auto">
+                            <Link href="/dashboard?role=student&studentId=student-2">
+                                <User className="mr-2" />
+                                View as Student 2
                             </Link>
                         </Button>
                         <Button asChild size="lg" variant="outline" className="w-full md:w-auto">
@@ -106,12 +112,13 @@ function AdminDashboard() {
 function DashboardContent() {
     const searchParams = useSearchParams();
     const role = searchParams.get('role');
+    const studentId = searchParams.get('studentId');
 
     if (role === 'teacher') {
       return <TeacherView />;
     }
-    if (role === 'student') {
-        return <StudentView studentId="student-1" />;
+    if (role === 'student' && studentId) {
+        return <StudentView studentId={studentId} />;
     }
     
     return <AdminDashboard />;

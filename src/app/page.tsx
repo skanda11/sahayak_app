@@ -46,10 +46,18 @@ export default function LoginPage() {
       
       const emailUsername = email.split('@')[0].toLowerCase();
       let role = 'student'; // Default to student
+      let studentId = '';
+
       if (emailUsername.includes('admin')) {
         role = 'admin';
       } else if (isTeacherEmail(email)) {
         role = 'teacher';
+      } else {
+        // Assuming student emails are like 'student-1@example.com', 'student-2@example.com', etc.
+        const match = emailUsername.match(/student-(\d+)/);
+        if (match) {
+          studentId = `student-${match[1]}`;
+        }
       }
 
       toast({
@@ -58,7 +66,8 @@ export default function LoginPage() {
         className: 'bg-accent text-accent-foreground',
       });
       
-      router.push(`/dashboard?role=${role}`);
+      const url = studentId ? `/dashboard?role=${role}&studentId=${studentId}` : `/dashboard?role=${role}`;
+      router.push(url);
 
     } catch (error: any) {
         let description = "An unknown error occurred.";
@@ -102,7 +111,7 @@ export default function LoginPage() {
           <CardHeader>
             <CardTitle className="text-2xl">Login</CardTitle>
             <CardDescription>
-                Use an email like <span className="font-semibold">student@example.com</span>, <span className="font-semibold">teacher@example.com</span>, or <span className="font-semibold">admin@example.com</span>. The password is <span className="font-semibold">password</span>.
+                Use an email like <span className="font-semibold">student-1@example.com</span>, <span className="font-semibold">teacher1@example.com</span>, or <span className="font-semibold">admin@example.com</span>. The password is <span className="font-semibold">password</span>.
             </CardDescription>
           </CardHeader>
           <CardContent>
