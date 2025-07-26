@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/icons';
 import { useToast } from '@/hooks/use-toast';
-import { LogIn } from 'lucide-react';
+import { LogIn, User, Shield, ArrowRight } from 'lucide-react';
 
 const auth = getAuth(app);
 
@@ -18,6 +18,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('password'); // Default password for demo
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -47,14 +49,22 @@ export default function LoginPage() {
       let role = 'student';
       if (emailUsername.includes('_teacher')) {
         role = 'teacher';
+      } else if (emailUsername.includes('_admin')) {
+        role = 'admin';
+        setIsAdmin(true);
       }
 
       toast({
         title: 'Login Successful',
-        description: `Welcome! Redirecting to the ${role} dashboard.`,
+        description: `Welcome!`,
         className: 'bg-accent text-accent-foreground',
       });
-      router.push(`/dashboard?role=${role}`);
+      
+      if (role === 'admin') {
+        setIsLoggedIn(true);
+      } else {
+        router.push(`/dashboard?role=${role}`);
+      }
 
     } catch (error: any) {
         let description = "An unknown error occurred.";
@@ -88,53 +98,72 @@ export default function LoginPage() {
             Welcome to AcademiaTrack
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Sign in to access your dashboard.
+            {isLoggedIn && isAdmin ? "Choose a dashboard to view." : "Sign in to access your dashboard."}
           </p>
         </header>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Login</CardTitle>
-            <CardDescription>
-              Use an email ending with <span className="font-semibold">_teacher@example.com</span> or <span className="font-semibold">_student@example.com</span>. The password for all test accounts is <span className="font-semibold">password</span>.
-            </CardDescription>
+            <CardTitle className="text-2xl">{isLoggedIn && isAdmin ? "Admin Navigation" : "Login"}</CardTitle>
+            {!isLoggedIn && (
+              <CardDescription>
+                Use an email like <span className="font-semibold">name_teacher@example.com</span>, <span className="font-semibold">name_student@example.com</span>, or <span className="font-semibold">name_admin@example.com</span>. The password is <span className="font-semibold">password</span>.
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isLoading}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  'Logging in...'
-                ) : (
-                  <>
-                    <LogIn className="mr-2" />
-                    Login
-                  </>
-                )}
-              </Button>
-            </form>
+            {isLoggedIn && isAdmin ? (
+                <div className="space-y-4">
+                    <Button onClick={() => router.push('/dashboard?role=student')} className="w-full justify-between" size="lg">
+                        <span>Student Dashboard</span>
+                        <User />
+                    </Button>
+                    <Button onClick={() => router.push('/dashboard?role=teacher')} className="w-full justify-between" size="lg" variant="secondary">
+                        <span>Teacher Dashboard</span>
+                        <Shield />
+                    </Button>
+                     <Button onClick={() => setIsLoggedIn(false)} className="w-full" variant="outline">
+                        <LogIn className="mr-2" />
+                        Back to Login
+                    </Button>
+                </div>
+            ) : (
+                <form onSubmit={handleLogin} className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                    id="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                    'Logging in...'
+                    ) : (
+                    <>
+                        <LogIn className="mr-2" />
+                        Login
+                    </>
+                    )}
+                </Button>
+                </form>
+            )}
           </CardContent>
         </Card>
       </div>

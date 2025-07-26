@@ -25,21 +25,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, FileQuestion, User, Settings } from 'lucide-react';
+import { Home, LogOut, FileQuestion, User, Settings, Shield } from 'lucide-react';
 import { Logo } from '../icons';
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const role = searchParams.get('role') || 'student';
-  const studentName = "Alex";
 
   const navItems = [
     { href: `/dashboard`, icon: Home, label: 'Dashboard' },
     { href: `/concept-clarification`, icon: FileQuestion, label: 'Concept Clarifier' },
   ];
 
-  const getHref = (href: string) => `${href}?role=${role}`;
+  const getHref = (href: string) => {
+    // For admin, the dashboard link should not have a role, to show the selection screen
+    const roleParam = role === 'admin' && href.includes('dashboard') ? 'admin' : role;
+    return `${href}?role=${roleParam}`;
+  }
+
+  const getUserDetails = () => {
+    switch(role) {
+      case 'teacher':
+        return { name: 'Dr. Smith', avatar: 'S' };
+      case 'admin':
+        return { name: 'Admin User', avatar: 'A' };
+      case 'student':
+      default:
+        return { name: 'Alex Johnson', avatar: 'A' };
+    }
+  }
+
+  const userDetails = getUserDetails();
 
   return (
     <SidebarProvider>
@@ -68,6 +85,19 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+             {role === 'admin' && (
+                <SidebarMenuItem>
+                    <SidebarMenuButton
+                        asChild
+                        isActive={pathname.startsWith('/dashboard') && searchParams.get('role') === 'teacher'}
+                        >
+                        <Link href="/dashboard?role=teacher">
+                            <Shield />
+                            <span>Teacher View</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+             )}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
@@ -76,10 +106,10 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <Button variant="ghost" className="h-12 w-full justify-start gap-2 px-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={`https://placehold.co/40x40.png`} data-ai-hint="profile avatar" />
-                  <AvatarFallback>{studentName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{userDetails.avatar}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium">{role === 'student' ? 'Alex Johnson' : 'Dr. Smith'}</span>
+                  <span className="text-sm font-medium">{userDetails.name}</span>
                   <span className="text-xs text-muted-foreground capitalize">{role}</span>
                 </div>
               </Button>
