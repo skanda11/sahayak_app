@@ -1,10 +1,12 @@
 
+
 import StudentView from '@/components/dashboard/student-view';
 import TeacherView from '@/components/dashboard/teacher-view';
 import { getStudentById } from '@/lib/mock-data';
 import type { Assignment } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { redirect } from 'next/navigation';
 
 async function getAssignmentsForStudent(studentId: string): Promise<Assignment[]> {
     const assignmentsCollectionRef = collection(db, 'students', studentId, 'assignments');
@@ -29,7 +31,7 @@ export default async function DashboardPage({
   const studentId = searchParams?.studentId;
 
   if (role === 'teacher') {
-    return <TeacherView />;
+    redirect('/dashboard/class');
   }
 
   if (role === 'student' && studentId) {
@@ -46,5 +48,5 @@ export default async function DashboardPage({
   }
 
   // Fallback to teacher view if no role is specified or role is invalid
-  return <TeacherView />;
+  redirect('/dashboard/class');
 }
