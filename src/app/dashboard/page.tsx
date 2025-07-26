@@ -16,6 +16,7 @@ function DashboardContent() {
     if (role === 'teacher') {
       return <TeacherView />;
     }
+    
     if (role === 'student' && studentId) {
         return <StudentView studentId={studentId} />;
     }
