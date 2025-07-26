@@ -31,11 +31,11 @@ export default function StudentView({ student, assignments }: { student: Student
 
   return (
     <Tabs defaultValue="dashboard">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold font-headline">Student Dashboard</h1>
-        <TabsList>
-            <TabsTrigger value="dashboard">Overview</TabsTrigger>
-            <TabsTrigger value="assignments">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold font-headline">Student Dashboard</h1>
+        <TabsList className="w-full sm:w-auto">
+            <TabsTrigger value="dashboard" className="flex-1 sm:flex-initial">Overview</TabsTrigger>
+            <TabsTrigger value="assignments" className="flex-1 sm:flex-initial">
                 Assignments
                 {openAssignments.length > 0 && (
                     <span className="ml-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -43,8 +43,8 @@ export default function StudentView({ student, assignments }: { student: Student
                     </span>
                 )}
             </TabsTrigger>
-            <TabsTrigger value="clarifier">Concept Clarifier</TabsTrigger>
-            <TabsTrigger value="query">Ask a Query</TabsTrigger>
+            <TabsTrigger value="clarifier" className="flex-1 sm:flex-initial">Concept Clarifier</TabsTrigger>
+            <TabsTrigger value="query" className="flex-1 sm:flex-initial">Ask a Query</TabsTrigger>
         </TabsList>
       </div>
 
@@ -85,8 +85,8 @@ export default function StudentView({ student, assignments }: { student: Student
                 </Card>
                 <AiInsights student={student} />
             </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 xl:grid-cols-5">
-                <Card className="lg:col-span-2 xl:col-span-3">
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
+                <Card className="xl:col-span-3">
                     <CardHeader>
                         <CardTitle>Performance Over Time</CardTitle>
                     </CardHeader>
@@ -94,7 +94,7 @@ export default function StudentView({ student, assignments }: { student: Student
                         <ProgressChart grades={student.grades} />
                     </CardContent>
                 </Card>
-                <Card className="lg:col-span-1 xl:col-span-2">
+                <Card className="xl:col-span-2">
                     <CardHeader>
                         <CardTitle>Recent Grades</CardTitle>
                     </CardHeader>

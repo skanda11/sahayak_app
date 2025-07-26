@@ -99,8 +99,8 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                   <AvatarImage src={`https://placehold.co/40x40.png`} data-ai-hint="profile avatar" />
                   <AvatarFallback>{userDetails.avatar}</AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col items-start">
-                  <span className="text-sm font-medium">{userDetails.name}</span>
+                <div className="flex flex-col items-start overflow-hidden">
+                  <span className="text-sm font-medium truncate">{userDetails.name}</span>
                   <span className="text-xs text-muted-foreground capitalize">{userRole}</span>
                 </div>
               </Button>
