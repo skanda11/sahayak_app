@@ -15,7 +15,6 @@ import {
   SidebarFooter,
   SidebarInset,
   SidebarTrigger,
-  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -27,10 +26,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, User, Settings, Users, BookOpen, ClipboardList } from 'lucide-react';
+import { Home, LogOut, User, Settings } from 'lucide-react';
 import { Logo } from '../icons';
-import { getStudentById, getAllStudents } from '@/lib/mock-data';
-import type { Student } from '@/lib/types';
+import { getStudentById } from '@/lib/mock-data';
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -38,8 +36,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
-  const [students, setStudents] = useState<Student[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function setup() {
@@ -55,10 +51,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
         setUserRole('teacher');
         setUserName('Teacher');
       }
-
-      const allStudents = await getAllStudents();
-      setStudents(allStudents);
-      setIsLoading(false);
     }
     setup();
   }, [searchParams]);
@@ -94,34 +86,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-             <SidebarSeparator />
-             {isLoading ? (
-                Array.from({ length: 3 }).map((_, index) => (
-                    <SidebarMenuItem key={index}>
-                        <div className="flex items-center gap-2 p-2">
-                           <div className="h-6 w-6 rounded-full bg-muted animate-pulse"></div>
-                           <div className="h-4 w-24 rounded-md bg-muted animate-pulse"></div>
-                        </div>
-                    </SidebarMenuItem>
-                ))
-            ) : (
-                students.map((student) => (
-                    <SidebarMenuItem key={student.id}>
-                        <SidebarMenuButton
-                        asChild
-                        isActive={searchParams.get('studentId') === student.id}
-                        tooltip={{
-                            children: student.name,
-                        }}
-                        >
-                        <Link href={`/dashboard?role=student&studentId=${student.id}`}>
-                            <User />
-                            <span>{student.name}</span>
-                        </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))
-            )}
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter>
