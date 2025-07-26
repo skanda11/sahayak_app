@@ -8,6 +8,7 @@ import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
 import type { Student } from '@/lib/types';
 import ConceptClarifier from '../concept-clarification/concept-clarifier';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import StudentQuery from './student-query';
 
 // This is now an async Server Component
 export default async function StudentView({ studentId }: { studentId: string }) {
@@ -36,6 +37,7 @@ export default async function StudentView({ studentId }: { studentId: string }) 
         <TabsList>
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
             <TabsTrigger value="clarifier">Concept Clarifier</TabsTrigger>
+            <TabsTrigger value="query">Ask a Query</TabsTrigger>
         </TabsList>
       </div>
 
@@ -98,6 +100,9 @@ export default async function StudentView({ studentId }: { studentId: string }) 
       </TabsContent>
       <TabsContent value="clarifier">
         <ConceptClarifier />
+      </TabsContent>
+       <TabsContent value="query">
+        <StudentQuery />
       </TabsContent>
     </Tabs>
   );
