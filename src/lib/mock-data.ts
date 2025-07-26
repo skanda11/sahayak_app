@@ -48,13 +48,16 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
 ];
 
 export async function createMaterialRef(classId: string, subjectId: string) {
-    const materialCollectionRef = collection(db, 'materials', classId, subjectId);
-    const newDocRef = doc(materialCollectionRef);
+    // This creates a reference to a new document with an auto-generated ID
+    // in the collection materials/{classId}/{subjectId}
+    const newDocRef = doc(collection(db, 'materials', classId, subjectId));
+    // We need to ensure the parent documents exist, otherwise the path is invalid.
+    await setDoc(doc(db, 'materials', classId), {}, { merge: true });
     return newDocRef;
 }
 
-export async function updateMaterial(materialRef: any, material: Partial<Material>) {
-    await updateDoc(materialRef, material);
+export async function updateMaterial(materialRef: any, material: Partial<Omit<Material, 'id'>>) {
+    await setDoc(materialRef, material);
 }
 
 

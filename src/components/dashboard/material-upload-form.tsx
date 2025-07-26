@@ -66,7 +66,6 @@ export default function MaterialUploadForm({ classId, subjectId }: { classId: st
                     // 3. Get the download URL and update the Firestore document
                     const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
                     await updateMaterial(materialRef, {
-                        id: materialId,
                         name: file.name,
                         url: downloadURL,
                         type: 'reference'
