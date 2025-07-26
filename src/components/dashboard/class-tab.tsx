@@ -2,73 +2,36 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { useState } from "react";
-import MaterialUploadForm from "./material-upload-form";
-import ExistingMaterials from "./existing-materials";
+import GradeInputForm from "./grade-input-form";
+import { SeedButton } from "./seed-button";
+
 
 export default function ClassTab() {
-  const [selectedClassroom, setSelectedClassroom] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('');
-
-  // Placeholder data
-  const classrooms = ['Grade 5', 'Grade 6', 'Grade 7'];
-  const subjects = ['Mathematics', 'Science', 'English', 'History', 'Biology'];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Class Management</CardTitle>
-        <CardDescription>
-          Select a classroom and subject to manage reference materials.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 space-y-2">
-                <label className="text-sm font-medium">Classroom</label>
-                <Select onValueChange={setSelectedClassroom} value={selectedClassroom}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select or add a classroom" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {classrooms.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                         <SelectItem value="add-new-class">
-                            <span className="text-primary">Add new classroom...</span>
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex-1 space-y-2">
-                <label className="text-sm font-medium">Subject</label>
-                <Select onValueChange={setSelectedSubject} value={selectedSubject}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Select or add a subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {subjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        <SelectItem value="add-new-subject">
-                             <span className="text-primary">Add new subject...</span>
-                        </SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
-        </div>
-
-        {selectedClassroom && selectedSubject && (
-            <div className="space-y-6 pt-6 border-t">
-                <div>
-                    <h3 className="text-lg font-medium">Reference Materials for {selectedClassroom} - {selectedSubject}</h3>
-                    <p className="text-sm text-muted-foreground">Upload new textbooks, notes, or other reference materials for this subject, or view existing ones.</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <MaterialUploadForm classId={selectedClassroom} subjectId={selectedSubject} />
-                    <ExistingMaterials classId={selectedClassroom} subjectId={selectedSubject} />
-                </div>
-            </div>
-        )}
-
-      </CardContent>
-    </Card>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Grade Input</CardTitle>
+          <CardDescription>
+            Enter grades and feedback for students. If a roll number is not found, you will be prompted to create a new student.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <GradeInputForm />
+        </CardContent>
+      </Card>
+       <Card>
+        <CardHeader>
+          <CardTitle>Database Management</CardTitle>
+          <CardDescription>
+            Use this button to populate your Firestore database with initial mock data for students and grades. This is useful for the first time setup.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <SeedButton />
+        </CardContent>
+       </Card>
+    </div>
   );
 }
