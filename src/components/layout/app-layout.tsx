@@ -26,36 +26,49 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Home, LogOut, User, Settings } from 'lucide-react';
+import { Home, LogOut, User, Settings, Users, BookOpen } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById } from '@/lib/mock-data';
 
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') ?? 'student';
+  const role = searchParams.get('role') ?? 'teacher';
   const studentId = searchParams.get('studentId');
 
   const [userName, setUserName] = useState('User');
+  const [userRole, setUserRole] = useState('teacher');
 
   useEffect(() => {
-    if (role === 'student' && studentId) {
-        getStudentById(studentId).then(student => {
+    const currentRole = searchParams.get('role') ?? 'teacher';
+    const currentStudentId = searchParams.get('studentId');
+    setUserRole(currentRole);
+
+    if (currentRole === 'student' && currentStudentId) {
+        getStudentById(currentStudentId).then(student => {
             if(student) setUserName(student.name);
         })
-    } else if (role === 'teacher') {
+    } else if (currentRole === 'teacher') {
         setUserName('Teacher');
     }
-
-  }, [role, studentId]);
+  }, [searchParams]);
 
 
   const navItems = [
-    { href: `/dashboard`, icon: Home, label: 'Dashboard' },
+    { href: `/`, icon: Home, label: 'Dashboard' },
+    { href: `/student-view?studentId=student-1`, icon: User, label: 'Student 1 View' },
+    { href: `/student-view?studentId=student-2`, icon: User, label: 'Student 2 View' },
   ];
 
   const getHref = (href: string) => {
-    const params = new URLSearchParams(searchParams);
+    if (href.includes('?')) {
+        const [path, params] = href.split('?');
+        const urlParams = new URLSearchParams(params);
+        urlParams.set('role', path === '/' ? 'teacher' : 'student');
+        return `${path}?${urlParams.toString()}`;
+    }
+    const params = new URLSearchParams();
+    params.set('role', 'teacher');
     return `${href}?${params.toString()}`;
   }
 
@@ -79,12 +92,12 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
                   asChild
-                  isActive={pathname === item.href}
+                  isActive={item.href === '/' ? pathname === item.href : pathname.includes('/student-view') && searchParams.get('studentId') === item.href.split('=')[1]}
                   tooltip={{
                     children: item.label,
                   }}
                 >
-                  <Link href={getHref(item.href)}>
+                  <Link href={item.label.startsWith('Student') ? `/student-view?studentId=${item.href.split('studentId=')[1]}&role=student` : `/?role=teacher`}>
                     <item.icon />
                     <span>{item.label}</span>
                   </Link>
@@ -103,7 +116,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
                 </Avatar>
                 <div className="flex flex-col items-start">
                   <span className="text-sm font-medium">{userDetails.name}</span>
-                  <span className="text-xs text-muted-foreground capitalize">{role}</span>
+                  <span className="text-xs text-muted-foreground capitalize">{userRole}</span>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -112,10 +125,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem><User className="mr-2 h-4 w-4" /><span>Profile</span></DropdownMenuItem>
               <DropdownMenuItem><Settings className="mr-2 h-4 w-4" /><span>Settings</span></DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/"><LogOut className="mr-2 h-4 w-4" /><span>Log out</span></Link>
-              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SidebarFooter>
@@ -125,7 +134,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <div className="flex-1">
                 <h1 className="font-headline text-lg font-semibold capitalize">
-                  {pathname.split('/').pop()?.replace(/-/g, ' ') }
+                  {pathname.split('/').pop()?.replace(/-/g, ' ') || 'Dashboard'}
                 </h1>
             </div>
         </header>
