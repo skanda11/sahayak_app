@@ -38,3 +38,13 @@ export interface Assignment {
     assignedDate: string;
     completedDate?: string;
 }
+
+export interface Content {
+  id: string;
+  subjectId: string;
+  grade: string;
+  sessionNumber: number;
+  sessionTitle: string;
+  sessionContent: string;
+  status: 'under-review' | 'reviewed';
+}
