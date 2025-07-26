@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from '@/lib/firebase';
@@ -21,11 +22,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,10 +85,6 @@ export default function LoginPage() {
     }
   };
   
-  if (!isClient) {
-    return null; // Or a loading spinner
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
       <div className="w-full max-w-sm">
