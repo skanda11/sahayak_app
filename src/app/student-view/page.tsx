@@ -1,35 +1,14 @@
 
-'use client'
-
-import { useSearchParams } from 'next/navigation';
 import StudentView from '@/components/dashboard/student-view';
-import { Suspense } from 'react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { getStudentById } from '@/lib/mock-data';
 
-function StudentViewLoading() {
-    return (
-        <div className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-                <Skeleton className="h-32 w-full" />
-            </div>
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2">
-                    <Skeleton className="h-[400px] w-full" />
-                </div>
-                <div>
-                    <Skeleton className="h-[400px] w-full" />
-                </div>
-            </div>
-        </div>
-    )
-}
-
-function StudentViewPageContent() {
-  const searchParams = useSearchParams();
-  const studentId = searchParams.get('studentId');
+// This is now an async Server Component
+export default async function StudentViewPage({
+  searchParams,
+}: {
+  searchParams?: { studentId?: string };
+}) {
+  const studentId = searchParams?.studentId;
 
   if (!studentId) {
     return (
@@ -39,13 +18,16 @@ function StudentViewPageContent() {
     );
   }
 
-  return <StudentView studentId={studentId} />;
-}
+  const student = await getStudentById(studentId);
 
-export default function StudentViewPage() {
+  if (!student) {
     return (
-        <Suspense fallback={<StudentViewLoading />}>
-            <StudentViewPageContent />
-        </Suspense>
-    )
+        <div className="flex h-full items-center justify-center">
+            <p className="text-muted-foreground">Student with ID "{studentId}" not found.</p>
+        </div>
+    );
+  }
+
+  // We pass the fetched student data to the client component
+  return <StudentView student={student} />;
 }

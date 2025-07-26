@@ -1,5 +1,7 @@
 
-import { getStudentById, getSubjectById } from '@/lib/mock-data';
+'use client';
+
+import { getSubjectById } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
@@ -10,13 +12,7 @@ import ConceptClarifier from '../concept-clarification/concept-clarifier';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import StudentQuery from './student-query';
 
-// This is now an async Server Component
-export default async function StudentView({ studentId }: { studentId: string }) {
-  const student = await getStudentById(studentId);
-
-  if (!student) {
-    return <div>Student not found.</div>;
-  }
+export default function StudentView({ student }: { student: Student }) {
 
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
