@@ -11,7 +11,7 @@ export const subjects: Subject[] = [
   { id: 'biology', name: 'Biology', icon: Dna },
 ];
 
-const teacherEmails = ['teacher@example.com'];
+const teacherEmails = ['teacher1@example.com'];
 
 export function isTeacherEmail(email: string): boolean {
   return teacherEmails.includes(email.toLowerCase());
