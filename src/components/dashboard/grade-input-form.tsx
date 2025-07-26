@@ -24,11 +24,16 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { Subject } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
-import { addGrade, getAllSubjects } from "@/lib/mock-data"
+import { addGrade, getAllSubjects, getStudentByRollNumber } from "@/lib/mock-data"
 import { useRouter } from "next/navigation"
+import { useState, useCallback } from "react"
+import { useDebouncedCallback } from "use-debounce"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
-  studentName: z.string().min(2, { message: "Student name must be at least 2 characters." }),
+  rollNumber: z.string().min(1, { message: "Roll number is required." }),
+  studentId: z.string().optional(),
+  studentName: z.string().optional(),
   subjectId: z.string().min(1, { message: "Please select a subject." }),
   grade: z.coerce.number().min(0).max(100, { message: "Grade must be between 0 and 100." }),
   feedback: z.string().min(5, { message: "Feedback must be at least 5 characters." }).max(200),
@@ -39,30 +44,57 @@ export default function GradeInputForm() {
     const { toast } = useToast()
     const router = useRouter()
     const subjects = getAllSubjects();
+    const [foundStudentName, setFoundStudentName] = useState<string | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            studentName: "",
+            rollNumber: "",
             subjectId: "",
             grade: undefined,
             feedback: "",
         },
     })
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        const studentName = values.studentName;
-        // Naive way to create a student ID. In a real app, you'd use a better system.
-        const studentId = studentName.toLowerCase().replace(/\s+/g, '-');
+    const debounced = useDebouncedCallback(async (rollNumber: string) => {
+        if (rollNumber.length > 2) {
+            setIsSearching(true);
+            const student = await getStudentByRollNumber(rollNumber);
+            if (student) {
+                setFoundStudentName(student.name);
+                form.setValue("studentId", student.id);
+                form.setValue("studentName", student.name);
+                form.clearErrors("rollNumber");
+            } else {
+                setFoundStudentName(null);
+                form.setError("rollNumber", { type: "manual", message: "Student not found." });
+            }
+            setIsSearching(false);
+        } else {
+            setFoundStudentName(null);
+        }
+    }, 500);
 
-        await addGrade(studentId, studentName, values.subjectId, values.grade, values.feedback)
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (!values.studentId || !values.studentName) {
+            toast({
+              title: "Error",
+              description: "Could not find a student with that roll number. Please check and try again.",
+              variant: "destructive"
+            });
+            return;
+        }
+
+        await addGrade(values.studentId, values.studentName, values.subjectId, values.grade, values.feedback, values.rollNumber)
         
         toast({
           title: "Grade Submitted!",
-          description: `Grade for ${studentName} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
+          description: `Grade for ${values.studentName} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
           className: "bg-accent text-accent-foreground"
         })
-        form.reset()
+        form.reset();
+        setFoundStudentName(null);
         router.refresh()
     }
 
@@ -71,13 +103,26 @@ export default function GradeInputForm() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <FormField
                     control={form.control}
-                    name="studentName"
+                    name="rollNumber"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Student Name</FormLabel>
+                            <FormLabel>Student Roll Number</FormLabel>
                             <FormControl>
-                                <Input placeholder="e.g., Alex Johnson" {...field} />
+                                <div className="relative">
+                                    <Input 
+                                      placeholder="e.g., R001" 
+                                      {...field} 
+                                      onChange={(e) => {
+                                        field.onChange(e);
+                                        debounced(e.target.value);
+                                      }}
+                                    />
+                                    {isSearching && <Loader2 className="absolute right-2 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />}
+                                </div>
                             </FormControl>
+                            {foundStudentName && (
+                                <p className="text-sm text-green-600 font-medium mt-1">Found: {foundStudentName}</p>
+                            )}
                             <FormMessage />
                         </FormItem>
                     )}
@@ -130,7 +175,7 @@ export default function GradeInputForm() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || !foundStudentName}>
                     {form.formState.isSubmitting ? "Submitting..." : "Submit Grade"}
                 </Button>
             </form>

@@ -1,7 +1,7 @@
 import { Book, Calculator, Dna, FlaskConical, Globe } from 'lucide-react';
 import type { Student, Subject, Grade } from './types';
 import { db } from './firebase';
-import { doc, getDoc, getDocs, collection, setDoc, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection, setDoc, writeBatch, query, where, limit } from 'firebase/firestore';
 
 export const subjects: Subject[] = [
   { id: 'math', name: 'Mathematics', icon: Calculator },
@@ -15,6 +15,7 @@ const mockStudents: Omit<Student, 'grades'> & { grades: Omit<Grade, 'date'>[] }[
     {
       id: 'student-1',
       name: 'Alex Johnson',
+      rollNumber: 'R001',
       grades: [
         { subjectId: 'math', grade: 85, feedback: 'Good understanding of core concepts.'},
         { subjectId: 'science', grade: 92, feedback: 'Excellent lab report.'},
@@ -25,6 +26,7 @@ const mockStudents: Omit<Student, 'grades'> & { grades: Omit<Grade, 'date'>[] }[
     {
       id: 'student-2',
       name: 'Maria Garcia',
+      rollNumber: 'R002',
       grades: [
         { subjectId: 'math', grade: 95, feedback: 'Outstanding performance on the exam.'},
         { subjectId: 'science', grade: 81, feedback: 'Participation in class is improving.'},
@@ -35,6 +37,7 @@ const mockStudents: Omit<Student, 'grades'> & { grades: Omit<Grade, 'date'>[] }[
     {
       id: 'student-3',
       name: 'Sam Lee',
+      rollNumber: 'R003',
       grades: [
         { subjectId: 'math', grade: 72, feedback: 'Struggled with algebra but improving.'},
         { subjectId: 'history', grade: 94, feedback: 'Excellent research paper.'},
@@ -66,9 +69,29 @@ export async function getStudentById(id: string): Promise<Student | undefined> {
   return {
     id: studentDoc.id,
     name: studentData.name,
+    rollNumber: studentData.rollNumber,
     grades: grades,
   };
 }
+
+export async function getStudentByRollNumber(rollNumber: string): Promise<Pick<Student, 'id' | 'name'> | null> {
+    const studentsRef = collection(db, 'students');
+    const q = query(studentsRef, where("rollNumber", "==", rollNumber), limit(1));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        return null;
+    }
+
+    const studentDoc = querySnapshot.docs[0];
+    const studentData = studentDoc.data();
+
+    return {
+        id: studentDoc.id,
+        name: studentData.name,
+    };
+}
+
 
 export function getSubjectById(id: string): Subject | undefined {
     return subjects.find((s) => s.id === id);
@@ -92,6 +115,7 @@ export async function getAllStudents(): Promise<Student[]> {
       return {
         id: studentDoc.id,
         name: studentData.name,
+        rollNumber: studentData.rollNumber,
         grades: grades,
       };
     })
@@ -104,12 +128,12 @@ export function getAllSubjects(): Subject[] {
     return subjects;
 }
 
-export async function addGrade(studentId: string, studentName: string, subjectId: string, grade: number, feedback: string) {
+export async function addGrade(studentId: string, studentName: string, subjectId: string, grade: number, feedback: string, rollNumber?: string) {
     const studentRef = doc(db, 'students', studentId);
     const studentSnap = await getDoc(studentRef);
 
     if (!studentSnap.exists()) {
-      await setDoc(studentRef, { name: studentName });
+      await setDoc(studentRef, { name: studentName, rollNumber: rollNumber || '' });
     }
     
     const gradeData = {
@@ -135,7 +159,7 @@ export async function seedDatabase() {
 
     mockStudents.forEach(student => {
         const studentRef = doc(db, 'students', student.id);
-        batch.set(studentRef, { name: student.name });
+        batch.set(studentRef, { name: student.name, rollNumber: student.rollNumber });
 
         student.grades.forEach((grade, index) => {
             const gradeRef = doc(collection(db, 'students', student.id, 'grades'));

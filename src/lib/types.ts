@@ -8,6 +8,7 @@ export interface Grade {
 export interface Student {
   id: string;
   name: string;
+  rollNumber?: string;
   grades: Grade[];
 }
 
