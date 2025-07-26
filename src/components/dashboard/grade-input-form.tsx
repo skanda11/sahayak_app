@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type { Subject } from "@/lib/types"
 import { useToast } from "@/hooks/use-toast"
-import { addGrade, getAllSubjects, getStudentByRollNumber } from "@/lib/mock-data"
+import { addGrade, getAllSubjects, getStudentByRollNumber, createAssignment } from "@/lib/mock-data"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useDebouncedCallback } from "use-debounce"
@@ -82,9 +82,13 @@ export default function GradeInputForm() {
         }
     }, 500);
 
+    const keywords = ['improvement', 'areas', 'improve', 'build'];
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         let studentId = values.studentId;
         let studentName = values.studentName;
+        const subject = subjects.find(s => s.id === values.subjectId);
+        if (!subject) return;
 
         if (isNewStudent) {
             if (!studentName) {
@@ -112,9 +116,30 @@ export default function GradeInputForm() {
         
         toast({
           title: "Grade Submitted!",
-          description: `Grade for ${studentName} in ${subjects.find(s => s.id === values.subjectId)?.name} has been recorded.`,
+          description: `Grade for ${studentName} in ${subject?.name} has been recorded.`,
           className: "bg-accent text-accent-foreground"
         })
+
+        // Check for keywords and create assignment
+        const feedbackText = values.feedback.toLowerCase();
+        if (keywords.some(keyword => feedbackText.includes(keyword))) {
+            try {
+                await createAssignment(studentId, subject.id, subject.name, values.feedback);
+                toast({
+                    title: "Assignment Created",
+                    description: `An assignment has been created for ${studentName} based on your feedback.`,
+                    className: "bg-primary text-primary-foreground"
+                })
+            } catch(e) {
+                console.error("Failed to create assignment:", e);
+                toast({
+                    title: "Assignment Failed",
+                    description: "Could not create an assignment for the student.",
+                    variant: "destructive"
+                })
+            }
+        }
+
         form.reset({
             rollNumber: "",
             studentId: "",

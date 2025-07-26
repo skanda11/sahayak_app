@@ -6,13 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
-import { Award, TrendingDown, TrendingUp, Target } from 'lucide-react';
-import type { Student } from '@/lib/types';
+import { Award, TrendingDown, TrendingUp, Target, ClipboardCheck } from 'lucide-react';
+import type { Student, Assignment } from '@/lib/types';
 import ConceptClarifier from '../concept-clarification/concept-clarifier';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import StudentQuery from './student-query';
+import AssignmentView from './assignment-view';
 
-export default function StudentView({ student }: { student: Student }) {
+export default function StudentView({ student, assignments }: { student: Student, assignments: Assignment[] }) {
 
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
@@ -26,12 +27,22 @@ export default function StudentView({ student }: { student: Student }) {
   const bestSubjectId = sortedGradesByScore.length > 0 ? sortedGradesByScore[0].subjectId : null;
   const bestSubject = bestSubjectId ? getSubjectById(bestSubjectId) : null;
 
+  const openAssignments = assignments.filter(a => a.status === 'pending');
+
   return (
     <Tabs defaultValue="dashboard">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold font-headline">Student Dashboard</h1>
         <TabsList>
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
+            <TabsTrigger value="assignments">
+                Assignments
+                {openAssignments.length > 0 && (
+                    <span className="ml-2 bg-primary text-primary-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                        {openAssignments.length}
+                    </span>
+                )}
+            </TabsTrigger>
             <TabsTrigger value="clarifier">Concept Clarifier</TabsTrigger>
             <TabsTrigger value="query">Ask a Query</TabsTrigger>
         </TabsList>
@@ -92,6 +103,26 @@ export default function StudentView({ student }: { student: Student }) {
                     </CardContent>
                 </Card>
             </div>
+        </div>
+      </TabsContent>
+      <TabsContent value="assignments">
+        <div className="max-w-4xl mx-auto space-y-6">
+            <h2 className="text-2xl font-bold font-headline">Your Assignments</h2>
+            {assignments.length === 0 ? (
+                <Card>
+                    <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
+                        <ClipboardCheck className="h-12 w-12 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mt-4">All Caught Up!</h3>
+                        <p className="text-muted-foreground mt-2">You don't have any pending assignments.</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="space-y-4">
+                    {assignments.map(assignment => (
+                        <AssignmentView key={assignment.id} assignment={assignment} studentId={student.id} />
+                    ))}
+                </div>
+            )}
         </div>
       </TabsContent>
       <TabsContent value="clarifier">

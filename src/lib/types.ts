@@ -10,6 +10,7 @@ export interface Student {
   name: string;
   rollNumber?: string;
   grades: Grade[];
+  assignments?: Assignment[];
 }
 
 export interface Subject {
@@ -25,4 +26,15 @@ export interface QuizQuestion {
     text: string;
   }[];
   correctAnswer: string;
+}
+
+export interface Assignment {
+    id: string;
+    subjectId: string;
+    subjectName: string;
+    feedback: string;
+    quiz: string; // The generated quiz text
+    status: 'pending' | 'completed';
+    assignedDate: string;
+    completedDate?: string;
 }

@@ -10,10 +10,11 @@ import GradeInputForm from "./grade-input-form";
 import { Progress } from "@/components/ui/progress";
 import type { Student, Subject } from "@/lib/types";
 import { Button } from "../ui/button";
-import { Users, BookOpen, Database, User } from "lucide-react";
+import { Users, BookOpen, Database, User, FileText } from "lucide-react";
 import Link from "next/link";
 import { SeedButton } from "./seed-button";
 import { Skeleton } from '../ui/skeleton';
+import { Badge } from '../ui/badge';
 
 
 function TeacherViewSkeleton() {
@@ -92,6 +93,8 @@ export default function TeacherView() {
         return <TeacherViewSkeleton />;
     }
 
+    const studentsWithPendingAssignments = students.filter(s => (s.assignments?.filter(a => a.status === 'pending').length ?? 0) > 0).length;
+
     return (
         <div className="flex flex-col gap-6">
             <h1 className="text-3xl font-bold font-headline">Teacher Dashboard</h1>
@@ -106,14 +109,14 @@ export default function TeacherView() {
                         <p className="text-xs text-muted-foreground">students enrolled</p>
                     </CardContent>
                 </Card>
-                <Card>
+                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Subjects</CardTitle>
-                        <BookOpen className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-medium">Pending Assignments</CardTitle>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{subjects.length}</div>
-                        <p className="text-xs text-muted-foreground">subjects offered</p>
+                        <div className="text-2xl font-bold">{studentsWithPendingAssignments}</div>
+                        <p className="text-xs text-muted-foreground">students have open assignments</p>
                     </CardContent>
                 </Card>
                  <Card>
@@ -162,6 +165,7 @@ export default function TeacherView() {
                                     <TableRow>
                                         <TableHead>Student</TableHead>
                                         <TableHead className="text-center">Average Grade</TableHead>
+                                        <TableHead className="text-center hidden md:table-cell">Assignments</TableHead>
                                         <TableHead className="hidden md:table-cell">Recent Feedback</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -172,6 +176,7 @@ export default function TeacherView() {
                                             : 0;
                                         const latestGrade = [...student.grades].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
                                         const latestSubject = latestGrade ? getSubjectById(latestGrade.subjectId) : null;
+                                        const pendingAssignments = student.assignments?.filter(a => a.status === 'pending').length ?? 0;
 
                                         return (
                                             <TableRow key={student.id}>
@@ -189,6 +194,13 @@ export default function TeacherView() {
                                                         <span>{averageGrade.toFixed(1)}%</span>
                                                         <Progress value={averageGrade} className="h-2 w-24" />
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="text-center hidden md:table-cell">
+                                                    {pendingAssignments > 0 ? (
+                                                        <Badge variant="destructive">{pendingAssignments} Pending</Badge>
+                                                    ) : (
+                                                        <Badge variant="secondary">All Done</Badge>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="hidden md:table-cell max-w-xs truncate">
                                                     {latestGrade 

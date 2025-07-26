@@ -1,7 +1,8 @@
 import { Book, Calculator, Dna, FlaskConical, Globe } from 'lucide-react';
-import type { Student, Subject, Grade } from './types';
+import type { Student, Subject, Grade, Assignment } from './types';
 import { db } from './firebase';
-import { doc, getDoc, getDocs, collection, setDoc, writeBatch, query, where, limit } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection, setDoc, writeBatch, query, where, limit, updateDoc } from 'firebase/firestore';
+import { generateAssignment } from '@/ai/flows/assignment-generation';
 
 export const subjects: Subject[] = [
   { id: 'math', name: 'Mathematics', icon: Calculator },
@@ -11,7 +12,7 @@ export const subjects: Subject[] = [
   { id: 'biology', name: 'Biology', icon: Dna },
 ];
 
-const mockStudents: Omit<Student, 'grades'> & { grades: Omit<Grade, 'date'>[] }[] = [
+const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Grade, 'date'>[] }[] = [
     {
       id: 'student-1',
       name: 'Alex Johnson',
@@ -62,15 +63,22 @@ export async function getStudentById(id: string): Promise<Student | undefined> {
   }
 
   const studentData = studentDoc.data();
+  
   const gradesCollectionRef = collection(db, 'students', id, 'grades');
   const gradesSnapshot = await getDocs(gradesCollectionRef);
   const grades = gradesSnapshot.docs.map(doc => doc.data() as Grade);
+
+  const assignmentsCollectionRef = collection(db, 'students', id, 'assignments');
+  const assignmentsSnapshot = await getDocs(assignmentsCollectionRef);
+  const assignments = assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Assignment));
+
 
   return {
     id: studentDoc.id,
     name: studentData.name,
     rollNumber: studentData.rollNumber,
     grades: grades,
+    assignments: assignments,
   };
 }
 
@@ -112,11 +120,16 @@ export async function getAllStudents(): Promise<Student[]> {
       const gradesSnapshot = await getDocs(gradesCollectionRef);
       const grades = gradesSnapshot.docs.map((doc) => doc.data() as Grade);
 
+      const assignmentsCollectionRef = collection(db, 'students', studentDoc.id, 'assignments');
+      const assignmentsSnapshot = await getDocs(assignmentsCollectionRef);
+      const assignments = assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Assignment));
+
       return {
         id: studentDoc.id,
         name: studentData.name,
         rollNumber: studentData.rollNumber,
         grades: grades,
+        assignments: assignments,
       };
     })
   );
@@ -144,6 +157,34 @@ export async function addGrade(studentId: string, studentName: string, subjectId
     };
     const gradesCollectionRef = collection(db, 'students', studentId, 'grades');
     await setDoc(doc(gradesCollectionRef), gradeData);
+}
+
+export async function createAssignment(studentId: string, subjectId: string, subjectName: string, feedback: string) {
+    const { quiz } = await generateAssignment({ subject: subjectName, feedback });
+    
+    if (!quiz) {
+        throw new Error("Failed to generate quiz for assignment.");
+    }
+
+    const assignmentData: Omit<Assignment, 'id'> = {
+        subjectId,
+        subjectName,
+        feedback,
+        quiz,
+        status: 'pending',
+        assignedDate: new Date().toISOString().split('T')[0],
+    };
+
+    const assignmentsCollectionRef = collection(db, 'students', studentId, 'assignments');
+    await setDoc(doc(assignmentsCollectionRef), assignmentData);
+}
+
+export async function completeAssignment(studentId: string, assignmentId: string) {
+    const assignmentRef = doc(db, 'students', studentId, 'assignments', assignmentId);
+    await updateDoc(assignmentRef, {
+        status: 'completed',
+        completedDate: new Date().toISOString().split('T')[0],
+    });
 }
 
 export async function seedDatabase() {
