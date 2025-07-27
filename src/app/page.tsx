@@ -2,8 +2,12 @@
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowRight, User, Briefcase } from 'lucide-react';
+import { getAllStudents } from '@/lib/mock-data';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const students = await getAllStudents();
+  const firstStudentId = students.length > 0 ? students[0].id : 'student-1';
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4 sm:p-6">
       <div className="text-center mb-12">
@@ -27,7 +31,7 @@ export default function LandingPage() {
             </CardHeader>
           </Card>
         </Link>
-        <Link href="/dashboard?role=student&studentId=student-1" className="group">
+        <Link href={`/dashboard?role=student&studentId=${firstStudentId}`} className="group">
           <Card className="hover:shadow-lg hover:border-primary transition-all duration-300 h-full">
             <CardHeader className="p-6 sm:p-8">
                <div className="flex items-center justify-between">
