@@ -63,6 +63,12 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
     name: userName,
     avatar: userName.charAt(0).toUpperCase()
   };
+
+  const isLandingPage = pathname === '/';
+
+  if (isLandingPage) {
+    return <>{children}</>;
+  }
   
   return (
     <SidebarProvider>
