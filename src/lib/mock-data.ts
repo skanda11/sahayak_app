@@ -22,6 +22,7 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
         { subjectId: 'science', grade: 92, feedback: 'Excellent lab report.'},
         { subjectId: 'english', grade: 78, feedback: 'Needs to work on literary analysis.'},
         { subjectId: 'history', grade: 88, feedback: 'Strong grasp of historical events.'},
+        { subjectId: 'biology', grade: 91, feedback: 'Detailed and accurate diagrams in lab book.'},
       ],
     },
     {
