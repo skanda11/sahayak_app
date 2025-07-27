@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,7 +30,7 @@ export default function TeacherDashboard() {
       </TabsContent>
       <TabsContent value="activity">
         <ActivityTab />
-      </Tabs-Content>
+      </TabsContent>
     </Tabs>
   );
 }
