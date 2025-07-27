@@ -78,12 +78,15 @@ export default function AiContentStudio() {
 
         setIsLoading(true);
         try {
+            const gradeName = classes.find(c => c.id === selectedClass)?.name ?? 'Unknown Grade';
+            const subjectName = subjects.find(s => s.id === selectedSubject)?.name ?? 'Unknown Subject';
+
             await addContent({
                 ...generatedContent,
                 classId: selectedClass,
                 subjectId: selectedSubject,
-                grade: classes.find(c => c.id === selectedClass)?.name || '',
-                subjectName: subjects.find(s => s.id === selectedSubject)?.name || '',
+                grade: gradeName,
+                subjectName: subjectName,
                 status: 'under-review',
             });
 
