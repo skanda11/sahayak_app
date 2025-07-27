@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -32,14 +33,14 @@ export default function SessionContentGenerator({ classId, subjectId, grade, sub
 
         setIsLoading(true);
         try {
-            const result = await generateSessionContent({ topic, subject, grade });
+            const result = await generateSessionContent({ prompt: `Generate content for the topic: ${topic}, for subject: ${subject} and grade: ${grade}` });
             
             await addContent({
                 classId,
                 subjectId,
                 subjectName: subject,
                 grade,
-                sessionTitle: topic,
+                sessionTitle: result.sessionTitle || topic,
                 sessionContent: result.sessionContent,
                 status: 'under-review',
             });

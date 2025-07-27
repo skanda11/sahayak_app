@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import MaterialUploadForm from "./material-upload-form";
 import ExistingMaterials from "./existing-materials";
 import { SeedButton } from "./seed-button";
-import SessionContentGenerator from "./session-content-generator";
 
 // Mock data for classes and subjects
 const classes = [
@@ -37,7 +36,7 @@ export default function ClassTab() {
         <CardHeader>
           <CardTitle>Content Management</CardTitle>
           <CardDescription>
-            Select a class and subject to manage reference materials and generate new content.
+            Select a class and subject to manage reference materials.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -72,19 +71,7 @@ export default function ClassTab() {
             )}
         </CardContent>
       </Card>
-       {selectedClass && selectedSubject && (
-        <Card>
-            <CardHeader>
-                <CardTitle>AI Content Generation</CardTitle>
-                <CardDescription>
-                    Provide a topic to generate a session plan for {selectedClassName} - {selectedSubjectName}.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <SessionContentGenerator classId={selectedClass} subjectId={selectedSubject} grade={selectedClassName} subject={selectedSubjectName} />
-            </CardContent>
-        </Card>
-      )}
+      
       <Card>
         <CardHeader>
           <CardTitle>Database Management</CardTitle>
