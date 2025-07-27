@@ -13,32 +13,33 @@ export default function ExistingMaterials({ classId, subjectId }: { classId: str
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!classId || !subjectId) {
-            setMaterials([]);
-            setIsLoading(false);
-            return;
-        }
+        // if (!classId || !subjectId) {
+        //     setMaterials([]);
+        //     setIsLoading(false);
+        //     return;
+        // }
 
-        setIsLoading(true);
-        const materialsRef = collection(db, 'materials', classId, subjectId);
-        const q = query(materialsRef);
+        // setIsLoading(true);
+        // const materialsRef = collection(db, 'materials', classId, subjectId);
+        // const q = query(materialsRef);
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-            const data: Material[] = [];
-            querySnapshot.forEach((doc) => {
-                data.push({ id: doc.id, ...doc.data() } as Material);
-            });
-            setMaterials(data);
-            setIsLoading(false);
-        }, (error) => {
-            console.error("Failed to fetch materials:", error);
-            setIsLoading(false);
-        });
+        // const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        //     const data: Material[] = [];
+        //     querySnapshot.forEach((doc) => {
+        //         data.push({ id: doc.id, ...doc.data() } as Material);
+        //     });
+        //     setMaterials(data);
+        //     setIsLoading(false);
+        // }, (error) => {
+        //     console.error("Failed to fetch materials:", error);
+        //     setIsLoading(false);
+        // });
         
-        // Cleanup subscription on unmount
-        return () => {
-            unsubscribe();
-        };
+        // // Cleanup subscription on unmount
+        // return () => {
+        //     unsubscribe();
+        // };
+        setIsLoading(false);
     }, [classId, subjectId]);
 
     return (
