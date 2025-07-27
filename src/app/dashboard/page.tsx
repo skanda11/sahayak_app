@@ -5,7 +5,6 @@ import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
 import type { Assignment, Material } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { redirect } from 'next/navigation';
 
 async function getAssignmentsForStudent(studentId: string): Promise<Assignment[]> {
     const assignmentsCollectionRef = collection(db, 'students', studentId, 'assignments');
@@ -24,12 +23,12 @@ async function getAssignmentsForStudent(studentId: string): Promise<Assignment[]
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams?: { role?: string; studentId?: string };
+  searchParams?: { role?: string; studentId?: string; tab?: string };
 }) {
   const role = searchParams?.role;
   const studentId = searchParams?.studentId;
 
-  if (role === 'teacher') {
+  if (role === 'teacher' || (!role && !studentId)) {
     return <TeacherDashboard />;
   }
 
@@ -47,6 +46,6 @@ export default async function DashboardPage({
     );
   }
 
-  // Fallback to teacher view if no role is specified or role is invalid
+  // Fallback to teacher view if role is invalid
   return <TeacherDashboard />;
 }

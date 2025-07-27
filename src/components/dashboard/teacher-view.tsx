@@ -6,10 +6,19 @@ import ActivityTab from './activity-tab';
 import ClassTab from './class-tab';
 import ContentReview from './content-review';
 import PerformanceTab from './performance-tab';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function TeacherDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'class';
+
+  const onTabChange = (value: string) => {
+    router.push(`/dashboard?tab=${value}`);
+  }
+
   return (
-    <Tabs defaultValue="class">
+    <Tabs value={tab} onValueChange={onTabChange}>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl sm:text-3xl font-bold font-headline">Teacher Dashboard</h1>
         <TabsList>

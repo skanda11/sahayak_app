@@ -29,7 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, LayoutGrid, BarChart3, ListChecks, PenSquare } from 'lucide-react';
+import { User, Settings, LayoutGrid, BarChart3, ListChecks, PenSquare, BookOpen, ClipboardList, HelpCircle, FileQuestion } from 'lucide-react';
 import { Logo } from '../icons';
 import { getStudentById } from '@/lib/mock-data';
 
@@ -37,6 +37,7 @@ import { getStudentById } from '@/lib/mock-data';
 function AppLayoutClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const studentId = searchParams.get('studentId');
 
   const [userName, setUserName] = useState('Teacher');
   const [userRole, setUserRole] = useState('teacher');
@@ -44,7 +45,6 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function setup() {
       const role = searchParams.get('role');
-      const studentId = searchParams.get('studentId');
       
       if (role === 'student' && studentId) {
         setUserRole('student');
@@ -57,7 +57,7 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
       }
     }
     setup();
-  }, [searchParams]);
+  }, [searchParams, studentId]);
 
   const userDetails = {
     name: userName,
@@ -80,31 +80,64 @@ function AppLayoutClient({ children }: { children: React.ReactNode }) {
           </Link>
         </SidebarHeader>
         <SidebarContent>
+        {userRole === 'teacher' ? (
           <SidebarGroup>
             <SidebarGroupLabel>Teacher Dashboard</SidebarGroupLabel>
             <SidebarMenu>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/class'}>
-                        <Link href="/dashboard/class"><LayoutGrid /><span>Class</span></Link>
+                    <SidebarMenuButton asChild isActive={pathname === '/dashboard' || pathname.startsWith('/dashboard/class')}>
+                        <Link href="/dashboard"><LayoutGrid /><span>Class</span></Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/content-review'}>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/content-review')}>
                         <Link href="/dashboard/content-review"><PenSquare /><span>Content Review</span></Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/performance'}>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/performance')}>
                         <Link href="/dashboard/performance"><BarChart3 /><span>Performance</span></Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={pathname === '/dashboard/activity'}>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard/activity')}>
                         <Link href="/dashboard/activity"><ListChecks /><span>Activity</span></Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroup>
+        ) : (
+          <SidebarGroup>
+             <SidebarGroupLabel>Student Dashboard</SidebarGroupLabel>
+             <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard')}>
+                        <Link href={`/dashboard?role=student&studentId=${studentId}`}><LayoutGrid /><span>Overview</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href={`/dashboard?role=student&studentId=${studentId}&tab=assignments`}><ClipboardList /><span>Assignments</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href={`/dashboard?role=student&studentId=${studentId}&tab=references`}><BookOpen /><span>References</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href={`/dashboard?role=student&studentId=${studentId}&tab=clarifier`}><FileQuestion /><span>Concept Clarifier</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                        <Link href={`/dashboard?role=student&studentId=${studentId}&tab=query`}><HelpCircle /><span>Ask a Query</span></Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+             </SidebarMenu>
+          </SidebarGroup>
+        )}
         </SidebarContent>
         <SidebarFooter>
           <DropdownMenu>

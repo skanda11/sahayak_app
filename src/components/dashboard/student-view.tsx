@@ -16,8 +16,12 @@ import AssignmentView from './assignment-view';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Badge } from '../ui/badge';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function StudentDashboard({ student, assignments, materials }: { student: Student, assignments: Assignment[], materials: (Material & {subjectName: string})[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'dashboard';
 
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
@@ -38,8 +42,12 @@ export default function StudentDashboard({ student, assignments, materials }: { 
     return acc;
   }, {} as Record<string, (Material & {subjectName: string})[]>);
 
+  const onTabChange = (value: string) => {
+    router.push(`/dashboard?role=student&studentId=${student.id}&tab=${value}`);
+  }
+
   return (
-    <Tabs defaultValue="dashboard">
+    <Tabs value={tab} onValueChange={onTabChange}>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
         <h1 className="text-2xl sm:text-3xl font-bold font-headline">Student Dashboard</h1>
         <TabsList className="w-full sm:w-auto">
