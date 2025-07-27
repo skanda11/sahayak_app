@@ -1,66 +1,96 @@
-// src/ai/flows/session-content-generation.ts
-
 'use server';
 
+/**
+ * @fileOverview An AI agent that analyzes student performance and provides insights.
+ *
+ * - getPerformanceInsights - A function that handles the performance analysis process.
+ * - PerformanceInsightsInput - The input type for the getPerformanceInsights function.
+ * - PerformanceInsightsOutput - The return type for the getPerformanceinsights function.
+ */
+
 import {ai} from '@/ai/genkit';
+import {subjects} from '@/lib/mock-data';
+import type {Grade} from '@/lib/types';
 import {z} from 'genkit';
 
-const GenerateSessionContentInputSchema = z.object({
-  prompt: z.string().describe('The user-provided prompt to generate educational content from.'),
+const PerformanceInsightsInputSchema = z.object({
+  studentName: z.string().describe('The name of the student.'),
+  grades: z.array(z.object({
+    subjectId: z.string(),
+    grade: z.number(),
+    feedback: z.string(),
+    date: z.string(),
+  })).describe("The student's grades and feedback."),
 });
-export type GenerateSessionContentInput = z.infer<typeof GenerateSessionContentInputSchema>;
+export type PerformanceInsightsInput = z.infer<typeof PerformanceInsightsInputSchema>;
 
-const GenerateSessionContentOutputSchema = z.object({
-  sessionContent: z.string().describe('The generated HTML content for the educational session.'),
-  sessionTitle: z.string().describe('A suitable title for the generated content.'),
+const PerformanceInsightsOutputSchema = z.object({
+  summary: z.string().describe("A brief, one-paragraph summary of the student's overall performance."),
+  strengths: z.array(z.string()).describe('A list of the student\'s key strengths.'),
+  areasForImprovement: z.array(z.string()).describe('A list of areas where the student can improve.'),
 });
-export type GenerateSessionContentOutput = z.infer<typeof GenerateSessionContentOutputSchema>;
+export type PerformanceInsightsOutput = z.infer<typeof PerformanceInsightsOutputSchema>;
 
-export async function generateSessionContent(
-  input: GenerateSessionContentInput
-): Promise<GenerateSessionContentOutput> {
-  return sessionContentGenerationFlow(input);
+
+export async function getPerformanceInsights(
+  input: PerformanceInsightsInput
+): Promise<PerformanceInsightsOutput> {
+  return performanceInsightsFlow(input);
 }
 
-const sessionContentGenerationPrompt = ai.definePrompt({
-  name: 'sessionContentGenerationPrompt',
-  input: {schema: GenerateSessionContentInputSchema},
-  // We are still removing the output schema to avoid the Handlebars error
+const performanceInsightsPrompt = ai.definePrompt({
+  name: 'performanceInsightsPrompt',
+  input: {schema: z.object({grades: z.string(), studentName: z.string()})},
+  // We are removing the output schema here to avoid Handlebars error and parsing manually below.
   model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are an expert curriculum designer. A teacher has provided the following prompt.
-Generate educational content and a suitable title based on the prompt.
+  prompt: `You are an expert educational analyst. A teacher needs insights into a student's performance.
+Analyze the provided data, which includes grades and teacher feedback for various subjects.
 
-Prompt: "{{{prompt}}}"
+Student Name: {{{studentName}}}
+Performance Data (JSON format):
+{{{grades}}}
 
-You MUST return your response as a single, valid JSON object with two keys: "sessionTitle" (a string) and "sessionContent" (a string containing the generated HTML).
+Based on this data, provide a concise analysis. Identify the student's key strengths and areas for improvement.
+Your response MUST be a single, valid JSON object with three keys: "summary", "strengths", and "areasForImprovement".
 
-The HTML in "sessionContent" should be well-structured and styled for readability. Use <h1> for the main topic, <h2> for sub-sections, <p> for explanations, <ul> or <ol> with <li> for lists, and <strong> or <em> for emphasis.
-Provide a clear and simple explanation of the topic suitable for a school student.
-If the prompt asks for questions or a quiz, include them in a separate section within the HTML.
+- "summary": A brief, one-paragraph summary of the student's overall performance.
+- "strengths": An array of strings, each describing a specific strength (e.g., "Excellent scores in Science").
+- "areasForImprovement": An array of strings, each highlighting an area that needs attention (e.g., "Needs to focus on literary analysis in English").
 `,
 });
 
-const sessionContentGenerationFlow = ai.defineFlow(
+const performanceInsightsFlow = ai.defineFlow(
   {
-    name: 'sessionContentGenerationFlow',
-    inputSchema: GenerateSessionContentInputSchema,
-    outputSchema: GenerateSessionContentOutputSchema,
+    name: 'performanceInsightsFlow',
+    inputSchema: PerformanceInsightsInputSchema,
+    outputSchema: PerformanceInsightsOutputSchema,
   },
-  async input => {
-    // ✅ This is the corrected section
-    // Call the prompt directly as a function
-    const response = await sessionContentGenerationPrompt(input);
+  async (input) => {
+    // Manually map subjectId to subjectName for a more meaningful prompt
+    const gradesWithSubjectNames = input.grades.map((g: Grade) => {
+        const subject = subjects.find(s => s.id === g.subjectId);
+        return {
+            subject: subject ? subject.name : 'Unknown Subject',
+            grade: g.grade,
+            feedback: g.feedback,
+            date: g.date
+        }
+    });
 
-    // Get the raw text from the model's response
-    const llmResponseText = response.text;
+    const llmResponse = await performanceInsightsPrompt({
+        studentName: input.studentName,
+        grades: JSON.stringify(gradesWithSubjectNames, null, 2)
+    });
 
-    // Clean up potential markdown code fences (e.g., ```json ... ```)
-    const cleanedJson = llmResponseText.replace(/```json\n?/g, '').replace(/\n?```/g, '').trim();
+    const llmResponseText = llmResponse.text.replace(/```json\n?/g, '').replace(/\n?```/g, '').trim();
 
-    // Parse the cleaned text to a JSON object
-    const parsedOutput = JSON.parse(cleanedJson);
-
-    // Validate the parsed object against our output schema
-    return GenerateSessionContentOutputSchema.parse(parsedOutput);
+    try {
+        const parsedOutput = JSON.parse(llmResponseText);
+        return PerformanceInsightsOutputSchema.parse(parsedOutput);
+    } catch (e) {
+        console.error("Failed to parse LLM response:", e);
+        console.error("Raw LLM response:", llmResponseText);
+        throw new Error("The AI returned an invalid response. Please try again.");
+    }
   }
 );

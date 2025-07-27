@@ -4,42 +4,43 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-// 👇 Corrected the import to use the session content flow
-import { generateSessionContent } from '@/ai/flows/session-content-generation';
+import { getPerformanceInsights } from '@/ai/flows/performance-insights';
 import type { Student } from '@/lib/types';
-import { Sparkles, Bot } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Sparkles, Bot, Loader2 } from 'lucide-react';
 
-// Define the structure for the AI's output
 interface AiOutput {
-  sessionTitle: string;
-  sessionContent: string;
+  strengths: string[];
+  areasForImprovement: string[];
+  summary: string;
 }
 
 export function AiInsights({ student }: { student: Student }) {
-  const [prompt, setPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [aiResult, setAiResult] = useState<AiOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGenerateClick = async () => {
-    if (!prompt) {
-      setError('Please enter a topic or question.');
-      return;
-    }
+  const handleGetInsights = async () => {
     setIsLoading(true);
     setError(null);
     setAiResult(null);
     try {
-      // 👇 Call the correct, imported function with the right input
-      const result = await generateSessionContent({ prompt });
+      const result = await getPerformanceInsights({
+        studentName: student.name,
+        grades: student.grades,
+      });
       setAiResult(result);
     } catch (e) {
       console.error(e);
-      setError('Failed to generate content. Please try again.');
+      setError('Failed to generate insights. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -57,37 +58,47 @@ export function AiInsights({ student }: { student: Student }) {
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Bot className="mr-2 h-5 w-5" />
-            AI Content Generator
+            AI Performance Insights for {student.name}
           </DialogTitle>
           <DialogDescription>
-            Enter a topic, question, or concept to generate a custom learning session for {student.name}.
+            Click the button below to generate an AI-powered summary of this student's performance based on their recent grades and feedback.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="prompt">Topic or Question</Label>
-            <Textarea
-              id="prompt"
-              placeholder="e.g., 'Explain the water cycle' or 'Create a short quiz on photosynthesis'"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-            />
-          </div>
-          <Button onClick={handleGenerateClick} disabled={isLoading}>
-            {isLoading ? 'Generating...' : 'Generate'}
+        <div className="py-4">
+          <Button onClick={handleGetInsights} disabled={isLoading} className="w-full">
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating Insights...
+              </>
+            ) : (
+              'Generate Insights'
+            )}
           </Button>
         </div>
-        {error && <p className="text-sm font-medium text-destructive">{error}</p>}
+        {error && <p className="text-sm font-medium text-destructive text-center">{error}</p>}
         {aiResult && (
           <Card>
             <CardHeader>
-              <CardTitle>{aiResult.sessionTitle}</CardTitle>
+              <CardTitle>Analysis Complete</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: aiResult.sessionContent }}
-              />
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold">Summary</h4>
+                <p className="text-sm text-muted-foreground">{aiResult.summary}</p>
+              </div>
+              <div>
+                <h4 className="font-semibold">Strengths</h4>
+                <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {aiResult.strengths.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold">Areas for Improvement</h4>
+                 <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {aiResult.areasForImprovement.map((item, i) => <li key={i}>{item}</li>)}
+                </ul>
+              </div>
             </CardContent>
           </Card>
         )}
