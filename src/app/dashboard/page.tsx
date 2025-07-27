@@ -1,24 +1,8 @@
 
 import StudentDashboard from '@/components/dashboard/student-view';
 import TeacherDashboard from '@/components/dashboard/teacher-view';
-import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
+import { getStudentById, getMaterialsForStudent, getAssignmentsForStudent } from '@/lib/mock-data';
 import type { Assignment, Material } from '@/lib/types';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-
-async function getAssignmentsForStudent(studentId: string): Promise<Assignment[]> {
-    const assignmentsCollectionRef = collection(db, 'students', studentId, 'assignments');
-    const assignmentsSnapshot = await getDocs(assignmentsCollectionRef);
-    if (assignmentsSnapshot.empty) {
-        return [];
-    }
-    return assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Assignment)).sort((a, b) => {
-        if (a.status === 'pending' && b.status !== 'pending') return -1;
-        if (a.status !== 'pending' && b.status === 'pending') return 1;
-        return new Date(b.assignedDate).getTime() - new Date(a.assignedDate).getTime();
-    });
-}
-
 
 export default async function DashboardPage({
   searchParams,

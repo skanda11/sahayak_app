@@ -48,6 +48,19 @@ const mockStudents: Omit<Student, 'grades' | 'assignments'> & { grades: Omit<Gra
     },
 ];
 
+export async function getAssignmentsForStudent(studentId: string): Promise<Assignment[]> {
+    const assignmentsCollectionRef = collection(db, 'students', studentId, 'assignments');
+    const assignmentsSnapshot = await getDocs(assignmentsCollectionRef);
+    if (assignmentsSnapshot.empty) {
+        return [];
+    }
+    return assignmentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Assignment)).sort((a, b) => {
+        if (a.status === 'pending' && b.status !== 'pending') return -1;
+        if (a.status !== 'pending' && b.status === 'pending') return 1;
+        return new Date(b.assignedDate).getTime() - new Date(a.assignedDate).getTime();
+    });
+}
+
 export async function getMaterialsForSubject(classroom: string, subjectId: string): Promise<Material[]> {
   const materialsRef = collection(db, 'materials', classroom, subjectId);
   const snapshot = await getDocs(materialsRef);
