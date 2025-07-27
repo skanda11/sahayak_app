@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Badge } from '../ui/badge';
 import Link from 'next/link';
 
-export default function StudentView({ student, assignments, materials }: { student: Student, assignments: Assignment[], materials: (Material & {subjectName: string})[] }) {
+export default function StudentDashboard({ student, assignments, materials }: { student: Student, assignments: Assignment[], materials: (Material & {subjectName: string})[] }) {
 
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;

@@ -1,6 +1,6 @@
 
-
-import StudentView from '@/components/dashboard/student-view';
+import StudentDashboard from '@/components/dashboard/student-dashboard';
+import TeacherDashboard from '@/components/dashboard/teacher-dashboard';
 import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
 import type { Assignment, Material } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
@@ -30,7 +30,7 @@ export default async function DashboardPage({
   const studentId = searchParams?.studentId;
 
   if (role === 'teacher') {
-    redirect('/dashboard/class');
+    return <TeacherDashboard />;
   }
 
   if (role === 'student' && studentId) {
@@ -38,7 +38,7 @@ export default async function DashboardPage({
     if (student) {
       const assignments = await getAssignmentsForStudent(studentId);
       const materials = await getMaterialsForStudent(student);
-      return <StudentView student={student} assignments={assignments} materials={materials} />;
+      return <StudentDashboard student={student} assignments={assignments} materials={materials} />;
     }
      return (
         <div className="flex h-full items-center justify-center">
@@ -48,5 +48,5 @@ export default async function DashboardPage({
   }
 
   // Fallback to teacher view if no role is specified or role is invalid
-  redirect('/dashboard/class');
+  return <TeacherDashboard />;
 }
