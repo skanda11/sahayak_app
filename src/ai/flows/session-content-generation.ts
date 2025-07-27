@@ -1,16 +1,9 @@
+// src/ai/flows/session-content-generation.ts
 
 'use server';
 
-/**
- * @fileOverview An AI agent that generates educational session content based on a prompt.
- *
- * - generateSessionContent - A function that handles the session content generation process.
- * - GenerateSessionContentInput - The input type for the generateSessionContent function.
- * - GenerateSessionContentOutput - The return type for the generateSessionContent function.
- */
-
 import {ai} from '@/ai/genkit';
-import {googleAI} from '@genkit-ai/googleai';
+// Remove the googleAI import, it's not needed here
 import {z} from 'genkit';
 
 const GenerateSessionContentInputSchema = z.object({
@@ -34,7 +27,8 @@ const sessionContentGenerationPrompt = ai.definePrompt({
   name: 'sessionContentGenerationPrompt',
   input: {schema: GenerateSessionContentInputSchema},
   output: {schema: GenerateSessionContentOutputSchema},
-  model: googleAI('gemini-1.5-flash-latest'),
+  // ✅ Corrected line: Use the model's string identifier
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert curriculum designer. A teacher has provided the following prompt. Generate an HTML page with educational content based on it.
   Also generate a suitable title for the content based on the prompt.
 
