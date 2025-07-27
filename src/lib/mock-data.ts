@@ -56,6 +56,26 @@ export async function getMaterialsForSubject(classroom: string, subjectId: strin
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Material));
 }
 
+export async function getMaterialsForStudent(student: Student): Promise<(Material & { subjectName: string })[]> {
+    const studentSubjectIds = [...new Set(student.grades.map(g => g.subjectId))];
+    const allMaterials: (Material & { subjectName: string })[] = [];
+
+    for (const subjectId of studentSubjectIds) {
+        // This assumes a single class structure for now, e.g., 'grade-5'
+        // In a more complex app, you'd get the student's classId.
+        const classId = 'grade-5'; 
+        const materialsRef = collection(db, 'materials', classId, subjectId);
+        const snapshot = await getDocs(materialsRef);
+        const subjectName = getSubjectById(subjectId)?.name || 'Unknown Subject';
+
+        snapshot.forEach(doc => {
+            allMaterials.push({ id: doc.id, ...doc.data(), subjectName } as Material & { subjectName: string });
+        });
+    }
+
+    return allMaterials;
+}
+
 
 const teacherEmails = ['teacher1@example.com'];
 

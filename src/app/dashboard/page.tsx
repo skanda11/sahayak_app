@@ -1,8 +1,8 @@
 
 
 import StudentView from '@/components/dashboard/student-view';
-import { getStudentById } from '@/lib/mock-data';
-import type { Assignment } from '@/lib/types';
+import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
+import type { Assignment, Material } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { redirect } from 'next/navigation';
@@ -37,7 +37,8 @@ export default async function DashboardPage({
     const student = await getStudentById(studentId);
     if (student) {
       const assignments = await getAssignmentsForStudent(studentId);
-      return <StudentView student={student} assignments={assignments} />;
+      const materials = await getMaterialsForStudent(student);
+      return <StudentView student={student} assignments={assignments} materials={materials} />;
     }
      return (
         <div className="flex h-full items-center justify-center">

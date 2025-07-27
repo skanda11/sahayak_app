@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { getSubjectById } from '@/lib/mock-data';
@@ -6,14 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
 import AiInsights from './ai-insights';
-import { Award, TrendingDown, TrendingUp, Target, ClipboardCheck } from 'lucide-react';
-import type { Student, Assignment } from '@/lib/types';
+import { Award, TrendingDown, TrendingUp, Target, ClipboardCheck, FileText, FolderOpen } from 'lucide-react';
+import type { Student, Assignment, Material } from '@/lib/types';
 import ConceptClarifier from '../concept-clarification/concept-clarifier';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import StudentQuery from './student-query';
 import AssignmentView from './assignment-view';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Badge } from '../ui/badge';
+import Link from 'next/link';
 
-export default function StudentView({ student, assignments }: { student: Student, assignments: Assignment[] }) {
+export default function StudentView({ student, assignments, materials }: { student: Student, assignments: Assignment[], materials: (Material & {subjectName: string})[] }) {
 
   const grades = student.grades.map(g => g.grade);
   const averageGrade = grades.length > 0 ? grades.reduce((a, b) => a + b, 0) / grades.length : 0;
@@ -29,6 +33,11 @@ export default function StudentView({ student, assignments }: { student: Student
 
   const openAssignments = assignments.filter(a => a.status === 'pending');
 
+  const materialsBySubject = materials.reduce((acc, material) => {
+    (acc[material.subjectName] = acc[material.subjectName] || []).push(material);
+    return acc;
+  }, {} as Record<string, (Material & {subjectName: string})[]>);
+
   return (
     <Tabs defaultValue="dashboard">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
@@ -43,6 +52,7 @@ export default function StudentView({ student, assignments }: { student: Student
                     </span>
                 )}
             </TabsTrigger>
+            <TabsTrigger value="references" className="flex-1 sm:flex-initial">References</TabsTrigger>
             <TabsTrigger value="clarifier" className="flex-1 sm:flex-initial">Concept Clarifier</TabsTrigger>
             <TabsTrigger value="query" className="flex-1 sm:flex-initial">Ask a Query</TabsTrigger>
         </TabsList>
@@ -122,6 +132,47 @@ export default function StudentView({ student, assignments }: { student: Student
                         <AssignmentView key={assignment.id} assignment={assignment} studentId={student.id} />
                     ))}
                 </div>
+            )}
+        </div>
+      </TabsContent>
+      <TabsContent value="references">
+        <div className="max-w-4xl mx-auto space-y-6">
+            <h2 className="text-2xl font-bold font-headline">Reference Materials</h2>
+            {materials.length === 0 ? (
+                <Card>
+                    <CardContent className="pt-6 flex flex-col items-center justify-center text-center">
+                        <FolderOpen className="h-12 w-12 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mt-4">No Materials Found</h3>
+                        <p className="text-muted-foreground mt-2">Your teacher has not uploaded any reference materials yet.</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Accordion type="multiple" className="w-full">
+                {Object.entries(materialsBySubject).map(([subjectName, subjectMaterials]) => (
+                  <AccordionItem value={subjectName} key={subjectName}>
+                    <AccordionTrigger className="text-xl font-semibold">
+                      {subjectName}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-2">
+                        {subjectMaterials.map((material) => (
+                           <Card key={material.id}>
+                               <CardContent className="p-3">
+                                   <a href={material.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 group">
+                                       <FileText className="h-8 w-8 text-primary flex-shrink-0" />
+                                       <div className="flex-grow truncate">
+                                           <p className="font-medium truncate group-hover:underline">{material.name}</p>
+                                           <Badge variant="outline" className="text-xs">{material.type}</Badge>
+                                       </div>
+                                   </a>
+                               </CardContent>
+                           </Card>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             )}
         </div>
       </TabsContent>
