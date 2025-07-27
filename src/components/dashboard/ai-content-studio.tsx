@@ -52,6 +52,7 @@ export default function AiContentStudio() {
         setIsLoading(true);
         setGeneratedContent(null);
         try {
+            console.log(`Invoking Gemini API with prompt: "${prompt}"`);
             const result = await generateSessionContent({ prompt });
             setGeneratedContent(result);
         } catch (error) {
