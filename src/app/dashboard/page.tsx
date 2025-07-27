@@ -1,6 +1,6 @@
 
 import StudentDashboard from '@/components/dashboard/student-view';
-import TeacherDashboard from '@/components/dashboard/teacher-dashboard';
+import TeacherDashboard from '@/components/dashboard/teacher-view';
 import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
 import type { Assignment, Material } from '@/lib/types';
 import { collection, getDocs } from 'firebase/firestore';
