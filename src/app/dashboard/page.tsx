@@ -1,5 +1,5 @@
 
-import StudentDashboard from '@/components/dashboard/student-dashboard';
+import StudentDashboard from '@/components/dashboard/student-view';
 import TeacherDashboard from '@/components/dashboard/teacher-dashboard';
 import { getStudentById, getMaterialsForStudent } from '@/lib/mock-data';
 import type { Assignment, Material } from '@/lib/types';
