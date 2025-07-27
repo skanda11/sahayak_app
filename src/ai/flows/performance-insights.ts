@@ -15,11 +15,11 @@ import {z} from 'genkit';
 
 const PerformanceInsightsInputSchema = z.object({
   grades: z
-    .record(z.number())
-    .describe('A record of subject names and their corresponding grades (0-100).'),
+    .string()
+    .describe('A JSON string of subject names and their corresponding grades (0-100).'),
   feedback: z
-    .record(z.string())
-    .describe('A record of subject names and their corresponding feedback.'),
+    .string()
+    .describe('A JSON string of subject names and their corresponding feedback.'),
 });
 export type PerformanceInsightsInput = z.infer<typeof PerformanceInsightsInputSchema>;
 
@@ -28,8 +28,11 @@ const PerformanceInsightsOutputSchema = z.object({
 });
 export type PerformanceInsightsOutput = z.infer<typeof PerformanceInsightsOutputSchema>;
 
-export async function getPerformanceInsights(input: PerformanceInsightsInput): Promise<PerformanceInsightsOutput> {
-  return performanceInsightsFlow(input);
+export async function getPerformanceInsights(input: { grades: Record<string, number>, feedback: Record<string, string> }): Promise<PerformanceInsightsOutput> {
+  return performanceInsightsFlow({
+      grades: JSON.stringify(input.grades),
+      feedback: JSON.stringify(input.feedback)
+  });
 }
 
 const performanceInsightsPrompt = ai.definePrompt({
@@ -40,8 +43,8 @@ const performanceInsightsPrompt = ai.definePrompt({
 
   Analyze the student's grades and feedback, and provide a summary of their strengths and areas for improvement.
 
-  Grades: {{{JSON.stringify grades}}}
-  Feedback: {{{JSON.stringify feedback}}}
+  Grades: {{{grades}}}
+  Feedback: {{{feedback}}}
   `,
 });
 
