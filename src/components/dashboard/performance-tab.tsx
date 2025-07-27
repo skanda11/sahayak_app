@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getAllStudents } from "@/lib/mock-data";
 import type { Student } from "@/lib/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import AiInsights from "./ai-insights";
+import { AiInsights } from "./ai-insights";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { ExternalLink } from "lucide-react";

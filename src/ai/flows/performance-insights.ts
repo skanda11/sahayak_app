@@ -1,61 +1,66 @@
-// This file invokes the Gemini API to generate performance insights.
+// src/ai/flows/session-content-generation.ts
 
 'use server';
-
-/**
- * @fileOverview AI-powered tool to summarize a student's strengths and areas of improvement based on their grades and feedback.
- *
- * - getPerformanceInsights - A function that generates performance insights for a student.
- * - PerformanceInsightsInput - The input type for the getPerformanceInsights function.
- * - PerformanceInsightsOutput - The return type for the getPerformanceInsights function.
- */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const PerformanceInsightsInputSchema = z.object({
-  grades: z
-    .string()
-    .describe('A JSON string of subject names and their corresponding grades (0-100).'),
-  feedback: z
-    .string()
-    .describe('A JSON string of subject names and their corresponding feedback.'),
+const GenerateSessionContentInputSchema = z.object({
+  prompt: z.string().describe('The user-provided prompt to generate educational content from.'),
 });
-export type PerformanceInsightsInput = z.infer<typeof PerformanceInsightsInputSchema>;
+export type GenerateSessionContentInput = z.infer<typeof GenerateSessionContentInputSchema>;
 
-const PerformanceInsightsOutputSchema = z.object({
-  summary: z.string().describe('A summary of the student performance including strengths and areas for improvement.'),
+const GenerateSessionContentOutputSchema = z.object({
+  sessionContent: z.string().describe('The generated HTML content for the educational session.'),
+  sessionTitle: z.string().describe('A suitable title for the generated content.'),
 });
-export type PerformanceInsightsOutput = z.infer<typeof PerformanceInsightsOutputSchema>;
+export type GenerateSessionContentOutput = z.infer<typeof GenerateSessionContentOutputSchema>;
 
-export async function getPerformanceInsights(input: { grades: Record<string, number>, feedback: Record<string, string> }): Promise<PerformanceInsightsOutput> {
-  return performanceInsightsFlow({
-      grades: JSON.stringify(input.grades),
-      feedback: JSON.stringify(input.feedback)
-  });
+export async function generateSessionContent(
+  input: GenerateSessionContentInput
+): Promise<GenerateSessionContentOutput> {
+  return sessionContentGenerationFlow(input);
 }
 
-const performanceInsightsPrompt = ai.definePrompt({
-  name: 'performanceInsightsPrompt',
-  input: {schema: PerformanceInsightsInputSchema},
-  output: {schema: PerformanceInsightsOutputSchema},
-  prompt: `You are a helpful AI assistant that provides performance insights for a student based on their grades and feedback.
+const sessionContentGenerationPrompt = ai.definePrompt({
+  name: 'sessionContentGenerationPrompt',
+  input: {schema: GenerateSessionContentInputSchema},
+  // We are still removing the output schema to avoid the Handlebars error
+  model: 'googleai/gemini-1.5-flash-latest',
+  prompt: `You are an expert curriculum designer. A teacher has provided the following prompt.
+Generate educational content and a suitable title based on the prompt.
 
-  Analyze the student's grades and feedback, and provide a summary of their strengths and areas for improvement.
+Prompt: "{{{prompt}}}"
 
-  Grades: {{{grades}}}
-  Feedback: {{{feedback}}}
-  `,
+You MUST return your response as a single, valid JSON object with two keys: "sessionTitle" (a string) and "sessionContent" (a string containing the generated HTML).
+
+The HTML in "sessionContent" should be well-structured and styled for readability. Use <h1> for the main topic, <h2> for sub-sections, <p> for explanations, <ul> or <ol> with <li> for lists, and <strong> or <em> for emphasis.
+Provide a clear and simple explanation of the topic suitable for a school student.
+If the prompt asks for questions or a quiz, include them in a separate section within the HTML.
+`,
 });
 
-const performanceInsightsFlow = ai.defineFlow(
+const sessionContentGenerationFlow = ai.defineFlow(
   {
-    name: 'performanceInsightsFlow',
-    inputSchema: PerformanceInsightsInputSchema,
-    outputSchema: PerformanceInsightsOutputSchema,
+    name: 'sessionContentGenerationFlow',
+    inputSchema: GenerateSessionContentInputSchema,
+    outputSchema: GenerateSessionContentOutputSchema,
   },
   async input => {
-    const {output} = await performanceInsightsPrompt(input);
-    return output!;
+    // ✅ This is the corrected section
+    // Call the prompt directly as a function
+    const response = await sessionContentGenerationPrompt(input);
+
+    // Get the raw text from the model's response
+    const llmResponseText = response.text;
+
+    // Clean up potential markdown code fences (e.g., ```json ... ```)
+    const cleanedJson = llmResponseText.replace(/```json\n?/g, '').replace(/\n?```/g, '').trim();
+
+    // Parse the cleaned text to a JSON object
+    const parsedOutput = JSON.parse(cleanedJson);
+
+    // Validate the parsed object against our output schema
+    return GenerateSessionContentOutputSchema.parse(parsedOutput);
   }
 );
