@@ -6,7 +6,7 @@ import { getSubjectById } from '@/lib/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProgressChart } from './progress-chart';
 import { GradesTable } from './grades-table';
-import AiInsights from './ai-insights';
+import {AiInsights} from './ai-insights';
 import { Award, TrendingDown, TrendingUp, Target, ClipboardCheck, FileText, FolderOpen } from 'lucide-react';
 import type { Student, Assignment, Material } from '@/lib/types';
 import ConceptClarifier from '../concept-clarification/concept-clarifier';

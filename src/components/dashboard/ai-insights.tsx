@@ -50,7 +50,7 @@ export function AiInsights({ student }: { student: Student }) {
       <DialogTrigger asChild>
         <Button variant="outline">
           <Sparkles className="mr-2 h-4 w-4" />
-          Generate Educational Content
+          Generate personal insights
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
