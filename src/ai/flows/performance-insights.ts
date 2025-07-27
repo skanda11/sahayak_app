@@ -1,4 +1,4 @@
-// Implemented AI-powered tool to summarize student's strengths and areas of improvement based on grades and feedback.
+// This file invokes the Gemini API to generate performance insights.
 
 'use server';
 
